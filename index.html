@@ -1,0 +1,1799 @@
+﻿<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' data:; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self'; worker-src blob:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#059669">
+<meta name="description" content="برش‌یار — بهینه‌ساز نقشه برش ورق‌های MDF و PVC با الگوریتم گیوتین و لحاظ ضخامت تیغه">
+<title>برش‌یار — بهینه‌ساز برش ورق MDF و PVC</title>
+<style>
+
+/* ===== فونت وزیرمتن (جاسازی‌شده — کار آفلاین) ===== */
+@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Vazirmatn-Regular.woff2') format('woff2');}
+@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/Vazirmatn-Medium.woff2') format('woff2');}
+@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/Vazirmatn-Bold.woff2') format('woff2');}
+
+/* ===== توکن‌ها ===== */
+:root{
+  --bg:#eef2f6; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+  --accent:#059669; --accent-dark:#047857; --accent-soft:#d1fae5;
+  --blue:#0284c7; --danger:#dc2626; --warn:#92400e;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 10px 28px -14px rgba(15,23,42,.14);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{font-size:14.5px}
+body{margin:0;font-family:Vazirmatn,Tahoma,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;color:inherit}
+input,select{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== نوار بالا ===== */
+.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:10px clamp(12px,3vw,28px);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-inline-end:auto}
+.brand .logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#059669,#0284c7);display:grid;place-items:center;color:#fff;flex:none}
+.brand .logo .ic{width:20px;height:20px}
+.brand h1{font-size:18px;font-weight:800;line-height:1.3}
+.brand .sub{display:block;font-size:11.5px;color:var(--muted);font-weight:500}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:11px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:13.5px;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:#94a3b8;background:#f8fafc}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+.btn-icon{padding:8px;width:38px;justify-content:center}
+.btn-icon .ic{width:19px;height:19px}
+
+/* ===== چیدمان اصلی ===== */
+main{display:grid;grid-template-columns:minmax(320px,400px) minmax(0,1fr);gap:18px;padding:18px clamp(12px,3vw,28px) 70px;max-width:1520px;margin:0 auto;align-items:start}
+@media(max-width:1023px){main{grid-template-columns:minmax(0,1fr)}}
+
+/* ===== کارت‌ها ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card>details>summary{list-style:none;display:flex;align-items:center;gap:9px;padding:12px 16px;font-weight:800;font-size:14px;cursor:pointer;user-select:none;background:#f8fafc;border-bottom:1px solid var(--line)}
+.card>details>summary::-webkit-details-marker{display:none}
+.card>details>summary .chev{margin-inline-start:auto;transition:.2s;color:var(--muted);display:flex}
+.card>details[open]>summary .chev{transform:rotate(180deg)}
+.card .card-body{padding:14px 16px}
+
+/* ===== ردیف‌های ورودی ===== */
+.rows{display:flex;flex-direction:column;gap:8px}
+.rows-head{display:grid;gap:8px;align-items:center;font-size:11px;color:var(--muted);padding:0 2px 2px;font-weight:700}
+.row{display:grid;gap:8px;align-items:center}
+.row-panel{grid-template-columns:minmax(0,1fr) 78px 78px 56px 34px}
+.row-stock{grid-template-columns:1fr 1fr 88px 34px}
+@media(max-width:640px){
+  .row-panel{grid-template-columns:1fr 1fr 1fr 52px 34px}
+  .row-panel .f-label{grid-column:1/-1}
+  .row-stock{grid-template-columns:1fr 1fr 70px 34px}
+}
+.field{width:100%;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;transition:.15s}
+.field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input[type=number].field{direction:ltr;text-align:center;padding:8px 4px}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+select.field{padding:8px 10px}
+.row-del{width:34px;height:36px;border:1px solid transparent;border-radius:10px;background:transparent;color:#94a3b8;display:grid;place-items:center;transition:.15s}
+.row-del:hover{color:var(--danger);background:#fef2f2;border-color:#fecaca}
+.add-row{width:100%;margin-top:10px;padding:9px;border:1.5px dashed #cbd5e1;background:#f8fafc;border-radius:10px;color:var(--muted);font-weight:700;font-size:13px;display:flex;justify-content:center;align-items:center;gap:6px;transition:.15s}
+.add-row:hover{border-color:var(--accent);color:var(--accent);background:#f0fdf4}
+
+/* ===== گزینه‌ها و کلیدها ===== */
+.opt-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px dashed var(--line)}
+.opt-row:last-child{border-bottom:0}
+.opt-row .lbl{flex:1;font-weight:600;font-size:13px;line-height:1.5}
+.opt-row .hint{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+.opt-num{width:86px;flex:none}
+.switch{position:relative;width:42px;height:24px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0;z-index:1}
+.switch .track{position:absolute;inset:0;background:#cbd5e1;border-radius:99px;transition:.2s}
+.switch .track::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked+.track{background:var(--accent)}
+.switch input:checked+.track::after{transform:translateX(-18px)}
+
+/* ===== نتایج ===== */
+#results{display:flex;flex-direction:column;gap:16px;min-width:0}
+.result-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 14px}
+.result-bar .btn{padding:7px 12px;font-size:13px}
+/* نوار هشدار «برآورد است — با کات‌مستر نهایی کنید» */
+.notice-strip{background:#fef3c7;border:1px solid #f59e0b;border-radius:var(--radius);padding:11px 16px;font-size:13.5px;color:#78350f;line-height:1.9}
+.notice-strip b{color:#92400e}
+.empty .notice-strip{margin-top:18px}
+/* بنر هشدار فونت خارجی */
+.font-warn{background:#fee2e2;border:1px solid #ef4444;border-radius:12px;padding:10px 16px;font-size:13px;color:#7f1d1d;max-width:1160px;margin:0 auto 12px;line-height:1.9}
+/* بنر ورق تکراری */
+.stock-dup{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#eff6ff;border:1px dashed #3b82f6;border-radius:10px;padding:8px 12px;font-size:12.5px;color:#1e3a8a;margin-bottom:8px}
+.stock-dup .btn{padding:5px 12px;font-size:12px;border-radius:9px}
+.stats-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 28px;padding:8px 16px 12px}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.stat-row .k{color:var(--muted);font-weight:600}
+.stat-row .v{font-weight:800;white-space:nowrap}
+.stat-row .v .dim{color:var(--muted);font-weight:600;font-size:11.5px}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:12px;font-weight:600}
+.chip .sw{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.18);flex:none}
+.sheet-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.sheet-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:11px 16px;border-bottom:1px solid var(--line);background:#f8fafc}
+.sheet-head h3{font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{background:#e2e8f0;color:#334155;font-size:11px;font-weight:700;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.badge.green{background:var(--accent-soft);color:#065f46}
+.badge.red{background:#fee2e2;color:#991b1b}
+.sheet-actions{margin-inline-start:auto;display:flex;gap:6px}
+.sheet-actions .btn{padding:5px 10px;font-size:12px;border-radius:9px}
+.sheet-svg{padding:12px 14px 6px}
+.sheet-svg svg{width:100%;height:auto;display:block}
+.sheet-stats{display:flex;flex-wrap:wrap;gap:6px 18px;padding:4px 16px 10px;font-size:12px;color:var(--muted)}
+.sheet-stats b{color:var(--ink)}
+.cuts{border-top:1px solid var(--line)}
+.cuts>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:10px 16px;font-weight:800;font-size:13px;cursor:pointer;user-select:none;background:#fbfdff}
+.cuts>summary::-webkit-details-marker{display:none}
+.cuts>summary .chev{margin-inline-start:auto;transition:.2s;color:var(--muted);display:flex}
+.cuts[open]>summary .chev{transform:rotate(180deg)}
+.table-wrap{overflow-x:auto;padding:0 0 8px}
+table.cut-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+.cut-table th{background:#f1f5f9;font-size:11px;color:var(--muted);padding:8px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+.cut-table td{padding:6px 12px;border-bottom:1px dashed var(--line);white-space:nowrap}
+.cut-table tr:hover td{background:#f8fafc}
+.cut-table td.r{color:var(--muted);font-size:11.5px}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:10.5px;font-weight:700}
+.tag.trim{background:#fef3c7;color:#92400e}
+.tag.piece{background:var(--accent-soft);color:#065f46}
+.tag.part{background:#e0f2fe;color:#075985}
+.tag.waste{background:#f1f5f9;color:#64748b}
+
+/* ===== حالت خالی ===== */
+.empty{background:var(--card);border:1.5px dashed #cbd5e1;border-radius:var(--radius);padding:34px 24px;text-align:center;color:var(--muted)}
+.empty .big{width:52px;height:52px;color:#cbd5e1;margin:0 auto 10px}
+.empty h2{font-size:16px;color:var(--ink);margin-bottom:6px}
+.empty .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px;text-align:right}
+.empty .step{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px}
+.empty .step b{display:flex;align-items:center;gap:7px;color:var(--accent);margin-bottom:4px}
+.empty .step .n{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:inline-grid;place-items:center;font-size:11px}
+
+/* ===== هشدار ===== */
+.warn-card{background:#fffbeb;border:1px solid #fcd34d;border-radius:var(--radius);padding:12px 16px;color:var(--warn);font-size:13px}
+.warn-card ul{margin:6px 0 0;padding-inline-start:20px}
+
+/* ===== دکمه شناور ===== */
+.fab{position:fixed;bottom:18px;inset-inline-end:18px;width:62px;height:62px;border-radius:50%;background:var(--accent);color:#fff;border:none;box-shadow:0 12px 26px -6px rgba(5,150,105,.6);display:none;place-items:center;z-index:45;transition:.15s}
+.fab:hover{background:var(--accent-dark)}
+.fab .ic{width:26px;height:26px}
+@media(max-width:1023px){.fab{display:grid}}
+
+/* ===== توست ===== */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:#0f172a;color:#fff;padding:10px 20px;border-radius:12px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:70;max-width:92vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:var(--danger)}
+
+/* ===== مودال‌ها ===== */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;place-items:center;z-index:50;padding:16px}
+.modal.open{display:grid}
+.modal .box{background:#fff;border-radius:16px;max-width:660px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 24px 60px -12px rgba(15,23,42,.4)}
+.modal .box header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+.modal .box header h2{font-size:16px}
+.modal .box header .ic{color:var(--accent)}
+.modal .close{margin-inline-start:auto;border:none;background:transparent;color:var(--muted);width:34px;height:34px;border-radius:9px;display:grid;place-items:center}
+.modal .close:hover{background:#f1f5f9;color:var(--ink)}
+.modal .content{padding:16px 20px 20px}
+.form-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.form-row:last-of-type{border-bottom:0}
+.form-row .lbl{flex:1;font-weight:600;font-size:13px}
+.form-row .hint{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+.form-row select,.form-row .field{width:190px;flex:none}
+@media(max-width:540px){.form-row{flex-wrap:wrap}.form-row select,.form-row .field{width:100%}}
+.help-content h3{font-size:14px;margin:16px 0 6px;color:var(--accent-dark);display:flex;align-items:center;gap:7px}
+.help-content h3:first-child{margin-top:0}
+.help-content p{font-size:13px;color:#334155;margin-bottom:6px;text-align:justify}
+.help-content ul{margin:4px 0;padding-inline-start:20px;font-size:13px;color:#334155}
+.help-content li{margin-bottom:4px}
+
+/* ===== مشغول‌بودن ===== */
+#busy{position:fixed;inset:0;background:rgba(255,255,255,.75);backdrop-filter:blur(3px);display:none;place-items:center;z-index:60}
+#busy.show{display:grid}
+#busy .txt{text-align:center;font-weight:800}
+.spinner{width:46px;height:46px;border-radius:50%;border:4px solid var(--accent-soft);border-top-color:var(--accent);animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== چاپ ===== */
+#printRoot{display:none}
+@media print{
+  html,body{background:#fff}
+  .topbar,main,.fab,#toast,.modal,#busy{display:none!important}
+  #printRoot{display:block}
+  #printRoot h1{font-size:20px;margin-bottom:2px}
+  #printRoot .p-meta{font-size:11px;color:#475569;margin-bottom:8px}
+  #printRoot .p-notice{background:#fef3c7;border:1.5px solid #f59e0b;border-radius:8px;padding:7px 12px;font-size:11px;color:#78350f;margin-bottom:12px;line-height:1.8}
+  .p-sheet{break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
+  .p-sheet h2{font-size:14px;margin:10px 0 4px}
+  .p-sheet svg{width:100%;height:auto;max-height:60vh}
+  #printRoot table{width:100%;border-collapse:collapse;font-size:10px;margin:4px 0 12px}
+  #printRoot th,#printRoot td{border:1px solid #cbd5e1;padding:3px 7px;text-align:right}
+  #printRoot th{background:#f1f5f9}
+}
+@page{margin:12mm}
+
+</style>
+</head>
+<body>
+<!-- آیکون‌های SVG -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1.2 14a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 6"/><path d="M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88"/><path d="M14.47 14.48L20 20"/><path d="M8.12 8.12L12 12"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h9"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 11h.01M12 11h.01M16 11h.01M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01M16 17h.01"/></symbol>
+  <symbol id="i-cut-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+</svg>
+
+<header class="topbar no-print">
+  <div class="brand">
+    <div class="logo"><svg class="ic"><use href="#i-scissors"/></svg></div>
+    <div>
+      <h1>برش‌یار</h1>
+      <span class="sub">بهینه‌ساز نقشه برش ورق MDF / PVC — کاملاً آفلاین، در مرورگر شما</span>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" id="btnCalc" title="اجرای بهینه‌سازی"><svg class="ic"><use href="#i-play"/></svg><span>محاسبه</span></button>
+    <button class="btn" id="btnPrint" title="چاپ یا ذخیره PDF"><svg class="ic"><use href="#i-printer"/></svg><span>چاپ / PDF</span></button>
+    <button class="btn btn-icon" id="btnSave" title="ذخیره پروژه (JSON)"><svg class="ic"><use href="#i-save"/></svg></button>
+    <button class="btn btn-icon" id="btnLoad" title="بارگذاری پروژه"><svg class="ic"><use href="#i-folder"/></svg></button>
+    <button class="btn btn-icon" id="btnSettings" title="تنظیمات پیشرفته"><svg class="ic"><use href="#i-gear"/></svg></button>
+    <button class="btn btn-icon" id="btnHelp" title="راهنما"><svg class="ic"><use href="#i-help"/></svg></button>
+  </div>
+</header>
+
+<div id="fontWarn" class="font-warn no-print" hidden>
+  <b>فونت فارسی وزیرمتن بارگذاری نشد.</b> در نسخه سایت، پوشه <span class="num">fonts/</span> باید کنار index.html روی هاست باشد. فعلاً با فونت جایگزین مرورگر نمایش داده می‌شود — برای نسخه تک‌فایلیِ دارای فونت داخلی از cut-optimizer.html استفاده کنید.
+</div>
+
+<main>
+  <aside class="inputs no-print">
+    <section class="card">
+      <details open>
+        <summary><svg class="ic"><use href="#i-panel"/></svg> قطعات مورد نیاز <span class="chev"><svg class="ic"><use href="#i-chev"/></svg></span></summary>
+        <div class="card-body">
+          <div class="rows-head row row-panel"><span>نام قطعه (اختیاری)</span><span>طول</span><span>عرض</span><span>تعداد</span><span></span></div>
+          <div class="rows" id="panelRows"></div>
+          <button class="add-row" id="addPanel"><svg class="ic"><use href="#i-plus"/></svg> افزودن قطعه</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <details open>
+        <summary><svg class="ic"><use href="#i-layers"/></svg> ورق‌های خام موجود (Stock) <span class="chev"><svg class="ic"><use href="#i-chev"/></svg></span></summary>
+        <div class="card-body">
+          <div id="stockDup" class="stock-dup no-print" hidden>
+            <span id="stockDupText"></span>
+            <button class="btn" id="btnMergeStock">ادغام خودکار</button>
+          </div>
+          <div class="rows-head row row-stock"><span>طول ورق</span><span>عرض ورق</span><span>تعداد در انبار</span><span></span></div>
+          <div class="rows" id="stockRows"></div>
+          <button class="add-row" id="addStock"><svg class="ic"><use href="#i-plus"/></svg> افزودن ورق</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <details open>
+        <summary><svg class="ic"><use href="#i-gear"/></svg> گزینه‌های برش <span class="chev"><svg class="ic"><use href="#i-chev"/></svg></span></summary>
+        <div class="card-body">
+          <div class="opt-row">
+            <span class="lbl">ضخامت تیغه اره (Kerf)<span class="hint">معمولاً ۳ تا ۴ میلی‌متر؛ بین همه برش‌ها لحاظ می‌شود</span></span>
+            <input id="optKerf" class="field opt-num num" type="number" min="0" step="0.1">
+          </div>
+          <div class="opt-row">
+            <span class="lbl">نمایش برچسب (نام) روی قطعات</span>
+            <label class="switch"><input type="checkbox" id="optLabels"><span class="track"></span></label>
+          </div>
+          <div class="opt-row">
+            <span class="lbl">استفاده فقط از یک ورق<span class="hint">بررسی اینکه همه قطعات روی یک ورق جا می‌شوند؟</span></span>
+            <label class="switch"><input type="checkbox" id="optOneSheet"><span class="track"></span></label>
+          </div>
+          <div class="opt-row">
+            <span class="lbl">در نظر گرفتن جهت رگه<span class="hint">چرخش ۹۰ درجه قطعات غیرمجاز می‌شود</span></span>
+            <label class="switch"><input type="checkbox" id="optGrain"><span class="track"></span></label>
+          </div>
+          <div class="opt-row">
+            <span class="lbl">حاشیه‌گذاری لبه‌ها (Edge banding)<span class="hint">ضخامت نوار به ابعاد برش هر قطعه اضافه می‌شود</span></span>
+            <label class="switch"><input type="checkbox" id="optBanding"><span class="track"></span></label>
+          </div>
+          <div class="opt-row" id="bandThkRow" hidden>
+            <span class="lbl">ضخامت نوار لبه</span>
+            <input id="optBandThk" class="field opt-num num" type="number" min="0" step="0.1">
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="btnSample" style="flex:1"><svg class="ic"><use href="#i-info"/></svg> بارگذاری مثال</button>
+      <button class="btn" id="btnReset" style="flex:1"><svg class="ic"><use href="#i-trash"/></svg> پاک‌کردن همه</button>
+    </div>
+  </aside>
+
+  <section id="results">
+    <div id="emptyState" class="empty">
+      <svg class="ic big"><use href="#i-scissors"/></svg>
+      <h2>نقشه برش شما اینجا نمایش داده می‌شود</h2>
+      <p class="small">بهترین چیدمان با کمترین پرت را الگوریتم برش گیوتین محاسبه می‌کند.</p>
+      <div class="steps">
+        <div class="step"><b><span class="n">۱</span> ورق خام</b>طول، عرض و تعداد ورق‌های موجود در انبار را وارد کنید.</div>
+        <div class="step"><b><span class="n">۲</span> قطعات</b>لیست قطعات مورد نیاز را با ابعاد و تعداد اضافه کنید.</div>
+        <div class="step"><b><span class="n">۳</span> محاسبه</b>دکمه سبز «محاسبه» را بزنید و نقشه برش، آمار و دستورالعمل برش را ببینید.</div>
+      </div>
+      <div class="notice-strip">⚠️ <b>توجه:</b> این ابزار برای <b>برآورد تعداد ورق و نقشه اولیه</b> است؛ برای نتیجه نهایی و دقیق، نقشه را با برش‌کار خود یا دستگاه <b>کات‌مستر (CNC)</b> نهایی کنید و برش‌های واقعی را طبق همان انجام دهید.</div>
+    </div>
+
+    <div id="resultRoot" hidden style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div id="resultBar" class="result-bar" hidden>
+        <button class="btn" id="dlAllPng"><svg class="ic"><use href="#i-image"/></svg> دانلود PNG همه ورق‌ها</button>
+        <button class="btn" id="dlAllJpg"><svg class="ic"><use href="#i-image"/></svg> دانلود JPG همه ورق‌ها</button>
+        <span class="muted small">برای فایل PDF از دکمه «چاپ / PDF» استفاده کنید.</span>
+      </div>
+      <div class="notice-strip">⚠️ <b>توجه:</b> اعداد این نقشه یک <b>راهنمای محاسبه حدودی</b> است. قبل از برش واقعی، نقشه را با برش‌کار خود یا دستگاه <b>کات‌مستر</b> نهایی کنید و طبق برش واقعی کار کنید.</div>
+      <div class="card">
+        <details open>
+          <summary><svg class="ic"><use href="#i-calc"/></svg> آمار کلی (Global statistics) <span class="chev"><svg class="ic"><use href="#i-chev"/></svg></span></summary>
+          <div class="stats-list" id="globalStats"></div>
+        </details>
+      </div>
+      <div id="warnings"></div>
+      <div id="legend" class="legend no-print"></div>
+      <div id="sheetsWrap" style="display:flex;flex-direction:column;gap:16px;min-width:0"></div>
+      <div class="muted small no-print" id="metaLine" style="text-align:center"></div>
+    </div>
+  </section>
+</main>
+
+<button id="fab" class="fab no-print" title="محاسبه"><svg class="ic"><use href="#i-play"/></svg></button>
+<div id="toast"></div>
+<div id="busy"><div class="txt"><div class="spinner"></div>در حال بهینه‌سازی چیدمان…</div></div>
+
+<div class="modal" id="settingsModal">
+  <div class="box">
+    <header><svg class="ic"><use href="#i-gear"/></svg><h2>تنظیمات پیشرفته</h2><button class="close" data-close><svg class="ic"><use href="#i-x"/></svg></button></header>
+    <div class="content">
+      <div class="form-row"><span class="lbl">اولویت بهینه‌سازی</span>
+        <select id="setPriority" class="field">
+          <option value="waste">کمترین پرت (مساحت)</option>
+          <option value="cuts">کمترین تعداد برش</option>
+          <option value="sheets">کمترین تعداد ورق</option>
+        </select>
+      </div>
+      <div class="form-row"><span class="lbl">دقت جست‌وجو<span class="hint">تعداد چیدمان‌های جایگزین که امتحان می‌شود</span></span>
+        <select id="setQuality" class="field">
+          <option value="fast">سریع</option>
+          <option value="normal">متعادل</option>
+          <option value="high">دقیق (کندتر)</option>
+        </select>
+      </div>
+      <div class="form-row"><span class="lbl">واحد اندازه‌گیری</span>
+        <select id="setUnit" class="field">
+          <option value="mm">میلی‌متر (mm)</option>
+          <option value="cm">سانتی‌متر (cm)</option>
+          <option value="m">متر (m)</option>
+          <option value="in">اینچ (in)</option>
+        </select>
+      </div>
+      <div class="form-row"><span class="lbl">ارقام اعشار</span>
+        <select id="setDecimals" class="field">
+          <option value="0">۰</option><option value="1">۱</option><option value="2">۲</option><option value="3">۳</option>
+        </select>
+      </div>
+      <div class="form-row"><span class="lbl">هرس لبه ورق (از هر طرف)<span class="hint">حذف لبه‌های آسیب‌دیده قبل از چیدمان</span></span>
+        <input id="setTrim" class="field num" type="number" min="0" step="1">
+      </div>
+      <div class="form-row"><span class="lbl">حداقل اندازه نمایش تکه مازاد<span class="hint">تکه‌های مازاد کوچک‌تر از این، برچسب ابعاد نمی‌گیرند</span></span>
+        <input id="setMinOff" class="field num" type="number" min="0" step="10">
+      </div>
+      <p class="muted small" style="margin-top:10px">تغییر واحد روی همه ورودی‌ها و خروجی‌ها اعمال می‌شود؛ مساحت‌ها بر حسب متر مربع نمایش داده می‌شوند.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal">
+  <div class="box">
+    <header><svg class="ic"><use href="#i-help"/></svg><h2>راهنمای برش‌یار</h2><button class="close" data-close><svg class="ic"><use href="#i-x"/></svg></button></header>
+    <div class="content help-content">
+      <div class="notice-strip">⚠️ <b>توجه:</b> برش‌یار یک <b>راهنمای محاسبه حدودی</b> است؛ برای نتیجه درست و نهایی، نقشه را با برش‌کار خود یا دستگاه <b>کات‌مستر (CNC)</b> نهایی کنید و برش‌های واقعی را طبق همان انجام دهید.</div>
+      <h3>شروع سریع</h3>
+      <p>۱) در بخش «ورق‌های خام» ابعاد و تعداد ورق‌های انبار را وارد کنید. ۲) در «قطعات مورد نیاز» لیست برش را با ابعاد و تعداد بنویسید (نام قطعه اختیاری است). ۳) دکمه سبز «محاسبه» را بزنید. نتیجه شامل نقشه رنگی هر ورق، آمار پرت و جدول دستورالعمل برش است.</p>
+      <h3>برش گیوتین (Guillotine) چیست؟</h3>
+      <p>همه برش‌های این نرم‌افزار از یک لبه تا لبه دیگرِ بخش مورد برش ادامه دارند — دقیقاً مثل اره پنل‌بر یا جدول اره. هیچ برش «L شکل» یا سرِ‌وسط‌قطع در نقشه وجود ندارد، پس نقشه در کارگاه قابل اجرا است.</p>
+      <h3>ضخامت تیغه (Kerf)</h3>
+      <p>تیغه اره هنگام برش مقداری از متریال را می‌برد (معمولاً ۳ تا ۴ میلی‌متر). اگر ضخامت تیغه را وارد نکنید، قطعات واقعی کوچک‌تر از ابعاد درخواستی می‌شوند. مقدار آن را در «گزینه‌های برش» تنظیم کنید؛ بین همه برش‌ها لحاظ می‌شود.</p>
+      <h3>کلیدها</h3>
+      <ul>
+        <li><b>نمایش برچسب:</b> نام قطعه داخل مستطیل آن نوشته می‌شود (ابعاد همیشه نمایش داده می‌شوند).</li>
+        <li><b>فقط یک ورق:</b> بهینه‌ساز بررسی می‌کند آیا همه قطعات روی یک ورق جا می‌شوند یا نه.</li>
+        <li><b>جهت رگه:</b> چرخاندن قطعه ۹۰ درجه ممنوع می‌شود (برای ورق‌های رگه‌دار یا طرح‌دار).</li>
+        <li><b>حاشیه‌گذاری:</b> ضخامت نوار لبه به ابعاد برش هر قطعه اضافه می‌شود و لبه‌های قطعه با خط آبی مشخص می‌شود.</li>
+      </ul>
+      <h3>هرس لبه و تکه‌های مازاد</h3>
+      <p>اگر لبه‌های ورق آسیب‌داده یا قوس‌دار است، مقدار «هرس» را تنظیم کنید تا از هر چهار لبه برداشته شود. فضاهای خالی بزرگ روی ورق به‌صورت «تکه مازاد» با ابعاد مشخص نشان داده می‌شوند؛ این تکه‌ها را برای کارهای بعدی نگه دارید.</p>
+      <h3>خروجی‌ها</h3>
+      <ul>
+        <li><b>چاپ / PDF:</b> صفحه چاپ مخصوص کارگاه (از دیالوگ چاپ، گزینه Save as PDF را انتخاب کنید).</li>
+        <li><b>PNG / JPG:</b> دانلود تصویر نقشه هر ورق از دکمه‌های روی کارت هر ورق.</li>
+        <li><b>ذخیره/بارگذاری پروژه:</b> کل داده‌ها در یک فایل JSON ذخیره می‌شود.</li>
+      </ul>
+      <h3>نکته دقت</h3>
+      <p>قبل از برش اصلی، یک قطعه تست بزنید و ابعاد را با متر کنترل کنید. مقادیر نمایش داده‌شده در نقشه، ابعاد «قطعه» است؛ خط برش روی لبه بیرونی هر قطعه قرار می‌گیرد و ضخامت تیغه به سمت پرت می‌رود.</p>
+    </div>
+  </div>
+</div>
+
+<div id="printRoot"></div>
+<input type="file" id="fileInput" accept=".json,application/json" hidden>
+
+<script>
+window.FONT_FACE_CSS = "@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/Vazirmatn-Regular.woff2') format('woff2');}@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/Vazirmatn-Medium.woff2') format('woff2');}@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/Vazirmatn-Bold.woff2') format('woff2');}";
+
+window.__CUT_CORE_SRC__ = "/* ============================================================\n   برش‌یار — هسته بهینه‌ساز برش گیوتین (Guillotine) با Kerf\n   ماژول خالص، بدون DOM — در مرورگر و Node اجرا می‌شود\n   ============================================================ */\n(function (root) {\n  'use strict';\n\n  var EPS = 1e-6;\n  var UNITS = { mm: 1, cm: 10, m: 1000, in: 25.4 };\n\n  /* ---------- ابزارها ---------- */\n  function mulberry32(seed) {\n    var a = seed >>> 0;\n    return function () {\n      a |= 0; a = (a + 0x6D2B79F5) | 0;\n      var t = Math.imul(a ^ (a >>> 15), 1 | a);\n      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;\n      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;\n    };\n  }\n\n  function toNum(v) {\n    if (typeof v === 'number') return isFinite(v) ? v : 0;\n    if (v == null) return 0;\n    v = String(v).trim()\n      .replace(/[۰-۹]/g, function (c) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(c); })\n      .replace(/٫/g, '.').replace(/,/g, '');\n    var n = parseFloat(v);\n    return isFinite(n) ? n : 0;\n  }\n\n  // عدد امن: تبدیل + محدود به بازه (در برابر ورودی خراب/منفی/غول‌آسا)\n  function clampNum(v, min, max) {\n    v = toNum(v);\n    if (!isFinite(v)) v = 0;\n    return Math.min(max, Math.max(min, v));\n  }\n\n  var MAX_DIM = 30000;     // سقف هر بعد (میلی‌متر) = ۳۰ متر\n  var MAX_ITEMS = 1200;    // سقف تعداد قطعات در هر محاسبه\n  var MIN_DIM = 1;         // حداقل بعد معتبر قطعه (میلی‌متر)\n\n  /* ---------- آماده‌سازی ورودی ---------- */\n  // اگر هرس فعال باشد، از هر لبه «هرس + تیغه» برداشته می‌شود (برش هرس خودش تیغه مصرف می‌کند)\n  function sheetUsable(W, H, trim, k) {\n    if (trim > 0) return { w: W - 2 * (trim + k), h: H - 2 * (trim + k) };\n    return { w: W, h: H };\n  }\n\n  function prepare(sheets, panels, opt) {\n    var k = clampNum(opt.kerf, 0, 50);\n    var band = opt.banding ? clampNum(opt.bandThk, 0, 50) : 0;\n    var trim = clampNum(opt.trim, 0, 500);\n    var grain = !!opt.grain;\n    var items = [], problems = [];\n    (panels || []).forEach(function (p, pi) {\n      if (!p || typeof p !== 'object' || Array.isArray(p)) return;\n      var w = clampNum(p.w, 0, MAX_DIM) + band, h = clampNum(p.h, 0, MAX_DIM) + band;\n      var qty = Math.round(clampNum(p.qty, 0, 999));\n      if (qty <= 0 || w <= 0 || h <= 0) return;\n      if (w < MIN_DIM || h < MIN_DIM) {\n        problems.push({ label: p.label || ('قطعه ' + (pi + 1)), w: clampNum(p.w, 0, MAX_DIM), h: clampNum(p.h, 0, MAX_DIM), qty: qty,\n                        reason: 'ابعاد کمتر از ' + MIN_DIM + ' میلی‌متر' });\n        return;\n      }\n      var fits = false, i, s, u;\n      for (i = 0; i < sheets.length; i++) {\n        s = sheets[i];\n        if (clampNum(s.qty, 0, 9999) <= 0) continue;\n        u = sheetUsable(clampNum(s.w, 0, MAX_DIM), clampNum(s.h, 0, MAX_DIM), trim, k);\n        if ((w <= u.w + EPS && h <= u.h + EPS) ||\n            (!grain && h <= u.w + EPS && w <= u.h + EPS)) { fits = true; break; }\n      }\n      if (!fits) {\n        problems.push({ label: p.label || ('قطعه ' + (pi + 1)), w: clampNum(p.w, 0, MAX_DIM), h: clampNum(p.h, 0, MAX_DIM), qty: qty });\n        return;\n      }\n      for (var q = 0; q < qty; q++) {\n        items.push({ id: items.length, defId: pi, label: p.label || ('قطعه ' + (pi + 1)),\n                     w: w, h: h, nw: clampNum(p.w, 0, MAX_DIM), nh: clampNum(p.h, 0, MAX_DIM) });\n      }\n    });\n    return { items: items, problems: problems, k: k, band: band, trim: trim, grain: grain };\n  }\n\n  /* ---------- چیدمان یک ورق (بازگشتی گیوتین) ----------\n     مدل: مختصات واقعی، تیغه بعد از هر قطعه روی سمت پرت قرار می‌گیرد.\n     اگر باقیمانده عرض/ارتفاع منفی شود، برش تا لبه ورق ادامه می‌یابد (قطعه سالم می‌ماند). */\n  function packOneSheet(uw, uh, list, o, ox, oy) {\n    var placements = [];\n    var k = o.k;\n    ox = ox || 0; oy = oy || 0;\n\n    function cutNode(axis, at, len, region, children) {\n      var ids = [];\n      children.forEach(function (c) { for (var i = 0; i < c.ids.length; i++) ids.push(c.ids[i]); });\n      return { kind: 'cut', axis: axis, at: at, len: len, region: region, children: children, ids: ids };\n    }\n\n    function orientations(it) {\n      var a = [{ w: it.w, h: it.h, rot: false }];\n      if (!o.grain && it.w !== it.h) a.push({ w: it.h, h: it.w, rot: true });\n      return a;\n    }\n\n    function score(cand, r) {\n      var dw = r.w - cand.w, dh = r.h - cand.h, v;\n      if (o.heur === 'BSSF') v = Math.min(dw, dh);\n      else if (o.heur === 'BLSF') v = Math.max(dw, dh);\n      else v = dw * dh;                    // BAF: کمترین فضای باقی‌مانده\n      var b = (r.w + r.h) * 4;             // پاداش «چسبیدن کامل به لبه»\n      if (cand.w >= r.w - EPS) v -= b * 2;\n      if (cand.h >= r.h - EPS) v -= b * 2;\n      // ترجیح ملایم به قطعه بزرگ‌تر (تا قطعات بزرگ بی‌کار نمانند)\n      v -= (cand.w * cand.h) / (r.w * r.h + 1) * 3;\n      return v;\n    }\n\n    function fill(r, list) {\n      if (!list.length) return { kind: 'offcut', rect: r, ids: [] };\n      var cands = [], seen = {}, i, j, ors, c, s;\n      for (i = 0; i < list.length; i++) {\n        ors = orientations(list[i]);\n        for (j = 0; j < ors.length; j++) {\n          c = ors[j];\n          var key = c.w + 'x' + c.h;\n          if (seen[key]) continue;\n          seen[key] = 1;\n          if (c.w <= r.w + EPS && c.h <= r.h + EPS) {\n            cands.push({ c: c, it: list[i], s: score(c, r) });\n          }\n        }\n      }\n      if (!cands.length) return { kind: 'offcut', rect: r, ids: [] };\n      cands.sort(function (a, b2) { return a.s - b2.s; });\n      var pick;\n      if (o.explore > 0) {\n        // حریصانهٔ تصادفی: با شیفت توانی به سمت بهترین‌ها\n        var u = o.rng();\n        var idx = Math.floor(Math.pow(u, o.explore) * cands.length);\n        if (idx >= cands.length) idx = cands.length - 1;\n        pick = cands[idx];\n      } else {\n        pick = cands[0];\n      }\n      var best = pick.c, bestIt = pick.it;\n\n      var idx = list.indexOf(bestIt);\n      var rest = list.slice(0, idx).concat(list.slice(idx + 1));\n      var p = { id: bestIt.id, defId: bestIt.defId, label: bestIt.label,\n                x: r.x, y: r.y, w: best.w, h: best.h, rot: best.rot, nw: bestIt.nw, nh: bestIt.nh };\n      placements.push(p);\n      var pieceNode = { kind: 'piece', p: p, ids: [bestIt.id] };\n\n      var dw = r.w - best.w, dh = r.h - best.h;\n      var resW = dw - k, resH = dh - k;\n      var needV = dw > EPS, needH = dh > EPS;\n\n      if (!needV && !needH) return pieceNode;\n\n      if (needV && !needH) {\n        var right = resW > EPS ? fill({ x: r.x + best.w + k, y: r.y, w: resW, h: r.h }, rest) : { kind: 'offcut', rect: { x: r.x + best.w + k, y: r.y, w: Math.max(0, resW), h: r.h }, ids: [] };\n        return cutNode('x', r.x + best.w, r.h, r, [pieceNode, right]);\n      }\n      if (!needV && needH) {\n        var bottom = resH > EPS ? fill({ x: r.x, y: r.y + best.h + k, w: r.w, h: resH }, rest) : { kind: 'offcut', rect: { x: r.x, y: r.y + best.h + k, w: r.w, h: Math.max(0, resH) }, ids: [] };\n        return cutNode('y', r.y + best.h, r.w, r, [pieceNode, bottom]);\n      }\n\n      // هر دو جهت باقی است: دو برش پشت‌سرهم (گیوتین استاندارد)\n      var vert;\n      if (o.split === 'SAS') vert = resW <= resH;\n      else vert = resW > resH;              // LAS\n      if (o.split === 'RND') vert = o.rng() < 0.5;\n\n      if (vert) {\n        // برش ۱: عمودی در کل ارتفاع → نوار چپ + بخش راست\n        // برش ۲: افقی در نوار چپ → قطعه + بخش پایین‌چپ\n        var left = resH > EPS ? fill({ x: r.x, y: r.y + best.h + k, w: best.w, h: resH }, rest) : { kind: 'offcut', rect: { x: r.x, y: r.y + best.h + k, w: best.w, h: Math.max(0, resH) }, ids: [] };\n        var used = {}, usedArr = left.ids;\n        for (i = 0; i < usedArr.length; i++) used[usedArr[i]] = 1;\n        var rest2 = [];\n        for (i = 0; i < rest.length; i++) if (!used[rest[i].id]) rest2.push(rest[i]);\n        var rightR = resW > EPS ? fill({ x: r.x + best.w + k, y: r.y, w: resW, h: r.h }, rest2) : { kind: 'offcut', rect: { x: r.x + best.w + k, y: r.y, w: Math.max(0, resW), h: r.h }, ids: [] };\n        var inner = cutNode('y', r.y + best.h, best.w, { x: r.x, y: r.y, w: best.w, h: r.h }, [pieceNode, left]);\n        return cutNode('x', r.x + best.w, r.h, r, [inner, rightR]);\n      } else {\n        // برش ۱: افقی در کل عرض → بخش پایین + نوار بالا\n        // برش ۲: عمودی در نوار بالا → قطعه + بخش بالا-راست\n        var topRight = resW > EPS ? fill({ x: r.x + best.w + k, y: r.y, w: resW, h: best.h }, rest) : { kind: 'offcut', rect: { x: r.x + best.w + k, y: r.y, w: Math.max(0, resW), h: best.h }, ids: [] };\n        var used2 = {}, ua = topRight.ids;\n        for (i = 0; i < ua.length; i++) used2[ua[i]] = 1;\n        var rest3 = [];\n        for (i = 0; i < rest.length; i++) if (!used2[rest[i].id]) rest3.push(rest[i]);\n        var bottom2 = resH > EPS ? fill({ x: r.x, y: r.y + best.h + k, w: r.w, h: resH }, rest3) : { kind: 'offcut', rect: { x: r.x, y: r.y + best.h + k, w: r.w, h: Math.max(0, resH) }, ids: [] };\n        var inner2 = cutNode('x', r.x + best.w, best.h, { x: r.x, y: r.y, w: r.w, h: best.h }, [pieceNode, topRight]);\n        return cutNode('y', r.y + best.h, r.w, r, [inner2, bottom2]);\n      }\n    }\n\n    var root = fill({ x: ox, y: oy, w: uw, h: uh }, list);\n\n    // گردآوری برش‌ها (پیش‌ترتیب = ترتیب اجرای فیزیکی) و تکه‌های مازاد\n    var cuts = [], offcuts = [], cutLen = 0;\n    (function walk(n) {\n      if (n.kind === 'offcut') { offcuts.push(n.rect); return; }\n      if (n.kind === 'piece') return;\n      cuts.push(n);\n      for (var i = 0; i < n.children.length; i++) walk(n.children[i]);\n    })(root);\n\n    return { placements: placements, cuts: cuts, offcuts: offcuts, root: root };\n  }\n\n  /* ---------- مرتب‌سازی قطعات ---------- */\n  var ORDERS = {\n    area: function (a, b) { return (b.w * b.h) - (a.w * a.h) || Math.max(b.w, b.h) - Math.max(a.w, a.h); },\n    maxside: function (a, b) { return Math.max(b.w, b.h) - Math.max(a.w, a.h) || (b.w * b.h) - (a.w * a.h); },\n    width: function (a, b) { return b.w - a.w || b.h - a.h; },\n    height: function (a, b) { return b.h - a.h || b.w - a.w; },\n    perim: function (a, b) { return (b.w + b.h) - (a.w + a.h) || (b.w * b.h) - (a.w * a.h); }\n  };\n\n  /* ---------- حل یک ترکیب (چند ورق، چند نوع ورق) ---------- */\n  function solveOnce(items, stockTypes, opt, rng) {\n    var pool = stockTypes.map(function (s, i) { return { i: i, w: s.w, h: s.h, qty: s.qty }; });\n    var remaining = items.slice();\n    var sheets = [], guard = 0;\n\n    function lexLess(a, b) {\n      for (var i = 0; i < a.length; i++) { if (a[i] !== b[i]) return a[i] < b[i]; }\n      return false;\n    }\n\n    while (remaining.length && guard++ < 400) {\n      if (opt.oneSheet && sheets.length >= 1) {\n        return { sheets: sheets, unplaced: remaining, limited: true };\n      }\n      var bestType = -1, bestPack = null, bestScore = null;\n      for (var t = 0; t < pool.length; t++) {\n        var ty = pool[t];\n        if (ty.qty <= 0) continue;\n        var u = sheetUsable(ty.w, ty.h, opt.trim, opt.k);\n        if (u.w <= EPS || u.h <= EPS) continue;\n        // با هرس، ناحیه قابل استفاده از «هرس + تیغه» شروع می‌شود\n        var off = opt.trim > 0 ? opt.trim + opt.k : 0;\n        var pack = packOneSheet(u.w, u.h, remaining, { k: opt.k, grain: opt.grain, heur: opt.heur, split: opt.split, explore: opt.explore || 0, rng: rng }, off, off);\n        if (!pack.placements.length) continue;\n        var placedArea = 0;\n        for (var i = 0; i < pack.placements.length; i++) placedArea += pack.placements[i].w * pack.placements[i].h;\n        var sc = [-pack.placements.length, -placedArea, u.w * u.h];\n        if (bestScore === null || lexLess(sc, bestScore)) { bestScore = sc; bestType = ty; bestPack = pack; }\n      }\n      if (bestType < 0) return { sheets: sheets, unplaced: remaining };\n      bestType.qty--;\n      var placedIds = {};\n      for (i = 0; i < bestPack.placements.length; i++) placedIds[bestPack.placements[i].id] = 1;\n      remaining = remaining.filter(function (it) { return !placedIds[it.id]; });\n      sheets.push({ stockW: bestType.w, stockH: bestType.h, pack: bestPack });\n    }\n    return { sheets: sheets, unplaced: [] };\n  }\n\n  /* ---------- امتیاز کل راه‌حل بر اساس اولویت ---------- */\n  function scoreSolution(sol, opt) {\n    var usedArea = 0, placedArea = 0, cuts = 0, cutLen = 0;\n    for (var i = 0; i < sol.sheets.length; i++) {\n      var sh = sol.sheets[i];\n      usedArea += sh.stockW * sh.stockH;\n      cuts += sh.pack.cuts.length;\n      for (var j = 0; j < sh.pack.cuts.length; j++) cutLen += sh.pack.cuts[j].len;\n      for (var m = 0; m < sh.pack.placements.length; m++) placedArea += sh.pack.placements[m].w * sh.pack.placements[m].h;\n    }\n    var waste = usedArea - placedArea;\n    var unplaced = sol.unplaced.length;\n    if (opt.trim > 0) {\n      cuts += 4 * sol.sheets.length;\n      for (var i2 = 0; i2 < sol.sheets.length; i2++) cutLen += 2 * sol.sheets[i2].stockW + 2 * sol.sheets[i2].stockH;\n    }\n    var key;\n    if (opt.priority === 'cuts') key = [unplaced, cuts, waste, sol.sheets.length, cutLen];\n    else if (opt.priority === 'sheets') key = [unplaced, sol.sheets.length, waste, cuts, cutLen];\n    else key = [unplaced, waste, cuts, sol.sheets.length, cutLen];\n    return { key: key, waste: waste, cuts: cuts, cutLen: cutLen, sheetsUsed: sol.sheets.length, usedArea: usedArea, placedArea: placedArea, unplaced: unplaced };\n  }\n\n  /* ---------- جست‌وجوی ترکیب‌ها ---------- */\n  function buildCombos() {\n    var orders = ['area', 'maxside', 'height', 'width', 'perim'];\n    var heurs = ['BAF', 'BSSF', 'BLSF'];\n    var splits = ['SAS', 'LAS'];\n    var combos = [];\n    for (var oi = 0; oi < orders.length; oi++)\n      for (var hi = 0; hi < heurs.length; hi++)\n        for (var si = 0; si < splits.length; si++)\n          combos.push({ order: orders[oi], heur: heurs[hi], split: splits[si], shuffle: false });\n    return combos;\n  }\n\n  /* ---------- نقطه ورود اصلی ---------- */\n  function optimize(input) {\n    var t0 = Date.now();\n    var rawOpt = input.opt || {};\n    // پالایش گزینه‌ها (در برابر مقادیر منفی/غول‌آسا/نوع اشتباه)\n    var opt = {\n      kerf: clampNum(rawOpt.kerf, 0, 50),\n      bandThk: clampNum(rawOpt.bandThk, 0, 50),\n      trim: clampNum(rawOpt.trim, 0, 500),\n      minOffcutLabel: clampNum(rawOpt.minOffcutLabel, 0, 10000),\n      banding: !!rawOpt.banding, grain: !!rawOpt.grain, oneSheet: !!rawOpt.oneSheet,\n      priority: ['waste', 'cuts', 'sheets'].indexOf(rawOpt.priority) >= 0 ? rawOpt.priority : 'waste',\n      quality: ['fast', 'normal', 'high'].indexOf(rawOpt.quality) >= 0 ? rawOpt.quality : 'normal',\n      unit: rawOpt.unit, decimals: rawOpt.decimals, labels: !!rawOpt.labels\n    };\n    var prep = prepare(input.sheets || [], input.panels || [], opt);\n\n    if (prep.items.length > MAX_ITEMS) {\n      return { error: 'بیش از ' + MAX_ITEMS + ' قطعه در یک محاسبه مجاز نیست. تعداد را کمتر کنید.', elapsed: Date.now() - t0 };\n    }\n    if (!prep.items.length) {\n      return { empty: true, problems: prep.problems, elapsed: Date.now() - t0 };\n    }\n\n    var stockTypes = (input.sheets || []).filter(function (s) { return s && typeof s === 'object' && !Array.isArray(s); })\n      .map(function (s) { return { w: clampNum(s.w, 0, MAX_DIM), h: clampNum(s.h, 0, MAX_DIM), qty: Math.round(clampNum(s.qty, 0, 9999)) }; })\n      .filter(function (s) { return s.w > 0 && s.h > 0 && s.qty > 0; });\n\n    var budgetMs = { fast: 500, normal: 1800, high: 4000 }[opt.quality || 'normal'] || 1800;\n    var rndCount = { fast: 120, normal: 500, high: 1000 }[opt.quality || 'normal'] || 500;\n\n    var combos = buildCombos();\n    var bestSol = null, bestScore = null, tried = 0, seed = 1234567;\n\n    function tryCombo(c, shuffle) {\n      tried++;\n      var rng = mulberry32(seed + tried * 7919);\n      var list = prep.items.slice();\n      if (shuffle) {\n        for (var i = list.length - 1; i > 0; i--) {\n          var j = Math.floor(rng() * (i + 1));\n          var tmp = list[i]; list[i] = list[j]; list[j] = tmp;\n        }\n      } else {\n        list.sort(ORDERS[c.order]);\n      }\n      var sol = solveOnce(list, stockTypes, {\n        k: prep.k, trim: prep.trim, grain: prep.grain, oneSheet: !!opt.oneSheet,\n        priority: opt.priority || 'waste',\n        heur: c.heur, split: shuffle ? 'RND' : c.split, explore: shuffle ? (c.explore || 0) : 0, rng: rng\n      }, rng);\n      var sc = scoreSolution(sol, { priority: opt.priority || 'waste', trim: prep.trim });\n      if (bestScore === null || (function (a, b) { for (var i = 0; i < a.length; i++) { if (a[i] !== b[i]) return a[i] < b[i]; } return false; })(sc.key, bestScore.key)) {\n        bestSol = sol; bestScore = sc;\n      }\n    }\n\n    // ابتدا همه ترکیب‌های قطعی، سپس ترکیب‌های تصادفی تا سقف بودجه\n    var maxTotal = prep.items.length > 250 ? 40 : (prep.items.length > 120 ? 150 : combos.length + rndCount);\n    for (var i = 0; i < combos.length; i++) {\n      if (i >= 6 && Date.now() - t0 > budgetMs && bestSol) break;\n      tryCombo(combos[i], false);\n    }\n    for (var r = 0; r < rndCount && tried < maxTotal; r++) {\n      if (Date.now() - t0 > budgetMs && bestSol) break;\n      tryCombo({ order: 'area', heur: ['BAF', 'BSSF', 'BLSF'][r % 3], split: r % 2 ? 'SAS' : 'LAS', explore: 1.1 + (r % 8) * 0.45 }, true);\n    }\n\n    // نتیجه نهایی: ساخت آمار هر ورق + برش‌های هرس\n    var fmtSheets = [];\n    var totalCuts = 0, totalCutLen = 0, totalUsedArea = 0, totalPanelsAreaNominal = 0, totalOffcuts = 0;\n    var usedTypes = {};\n\n    for (var si2 = 0; si2 < bestSol.sheets.length; si2++) {\n      var sh2 = bestSol.sheets[si2];\n      var sheetArea = sh2.stockW * sh2.stockH;\n      var panelsNominal = 0, panelsCount = sh2.pack.placements.length;\n      for (var m2 = 0; m2 < sh2.pack.placements.length; m2++) panelsNominal += sh2.pack.placements[m2].nw * sh2.pack.placements[m2].nh;\n\n      var rows = [];\n      var tc = prep.trim;\n      if (tc > 0) {\n        rows.push({ kind: 'trim', label: 'هرس لبه راست/چپ', axis: 'x', atRel: tc, len: sh2.stockH, note: 'از هر طرف عرض' });\n        rows.push({ kind: 'trim', label: 'هرس لبه بالا/پایین', axis: 'y', atRel: tc, len: sh2.stockW, note: 'از هر طرف طول' });\n      }\n      for (var ci = 0; ci < sh2.pack.cuts.length; ci++) {\n        var c2 = sh2.pack.cuts[ci];\n        var atRel = c2.axis === 'x' ? (c2.at - c2.region.x) : (c2.at - c2.region.y);\n        var result = c2.children.map(function (ch) {\n          if (ch.kind === 'piece') return { kind: 'piece', w: ch.p.w, h: ch.p.h };\n          if (ch.kind === 'offcut') return { kind: 'waste', w: Math.max(0, ch.rect.w), h: Math.max(0, ch.rect.h) };\n          return { kind: 'part', w: ch.region.w, h: ch.region.h };\n        });\n        rows.push({ kind: 'cut', axis: c2.axis, atRel: atRel, len: c2.len, region: c2.region, result: result });\n      }\n\n      var cutCount = rows.length, cutLen = 0;\n      for (var ri = 0; ri < rows.length; ri++) cutLen += rows[ri].len;\n      var offc = sh2.pack.offcuts.filter(function (o2) { return o2.w > EPS && o2.h > EPS; });\n      var typeKey = sh2.stockW + '×' + sh2.stockH;\n      usedTypes[typeKey] = (usedTypes[typeKey] || 0) + 1;\n\n      fmtSheets.push({\n        idx: si2 + 1, stockW: sh2.stockW, stockH: sh2.stockH, trim: prep.trim, kerf: prep.k,\n        placements: sh2.pack.placements,\n        cutRows: rows, cuts: cutCount, cutLen: cutLen,\n        offcuts: offc,\n        panelsCount: panelsCount, panelsArea: panelsNominal,\n        usedArea: sheetArea, wasteArea: sheetArea - panelsNominal,\n        usagePct: sheetArea > 0 ? panelsNominal / sheetArea : 0\n      });\n\n      totalCuts += cutCount; totalCutLen += cutLen;\n      totalUsedArea += sheetArea; totalPanelsAreaNominal += panelsNominal;\n      totalOffcuts += offc.length;\n    }\n\n    var placedNominal = totalPanelsAreaNominal;\n    var unplacedList = bestSol.unplaced.map(function (it) { return { label: it.label, w: it.nw, h: it.nh }; });\n    // تجمیع قطعات نچیده‌شده بر اساس اندازه\n    var unplacedAgg = {};\n    unplacedList.forEach(function (u2) {\n      var kk = u2.label + '|' + u2.w + '×' + u2.h;\n      unplacedAgg[kk] = unplacedAgg[kk] || { label: u2.label, w: u2.w, h: u2.h, qty: 0 };\n      unplacedAgg[kk].qty++;\n    });\n\n    return {\n      empty: false,\n      sheets: fmtSheets,\n      totals: {\n        sheetsUsed: fmtSheets.length,\n        usedTypes: usedTypes,\n        usedArea: totalUsedArea,\n        panelsArea: placedNominal,\n        wasteArea: totalUsedArea - placedNominal,\n        usagePct: totalUsedArea > 0 ? placedNominal / totalUsedArea : 0,\n        cuts: totalCuts,\n        cutLen: totalCutLen,\n        offcuts: totalOffcuts,\n        unplaced: Object.keys(unplacedAgg).map(function (kk) { return unplacedAgg[kk]; }),\n        limited: !!bestSol.limited\n      },\n      problems: prep.problems,\n      kerf: prep.k, band: prep.band, trim: prep.trim, grain: prep.grain,\n      priority: opt.priority || 'waste',\n      tried: tried,\n      elapsed: Date.now() - t0\n    };\n  }\n\n  var api = {\n    optimize: optimize,\n    prepare: prepare,\n    sheetUsable: sheetUsable,\n    packOneSheet: packOneSheet,\n    toNum: toNum,\n    UNITS: UNITS,\n    EPS: EPS\n  };\n\n  if (typeof module !== 'undefined' && module.exports) module.exports = api;\n  else root.CutCore = api;\n})(typeof window !== 'undefined' ? window : globalThis);\n";
+
+/* ============================================================
+   برش‌یار — هسته بهینه‌ساز برش گیوتین (Guillotine) با Kerf
+   ماژول خالص، بدون DOM — در مرورگر و Node اجرا می‌شود
+   ============================================================ */
+(function (root) {
+  'use strict';
+
+  var EPS = 1e-6;
+  var UNITS = { mm: 1, cm: 10, m: 1000, in: 25.4 };
+
+  /* ---------- ابزارها ---------- */
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function toNum(v) {
+    if (typeof v === 'number') return isFinite(v) ? v : 0;
+    if (v == null) return 0;
+    v = String(v).trim()
+      .replace(/[۰-۹]/g, function (c) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(c); })
+      .replace(/٫/g, '.').replace(/,/g, '');
+    var n = parseFloat(v);
+    return isFinite(n) ? n : 0;
+  }
+
+  // عدد امن: تبدیل + محدود به بازه (در برابر ورودی خراب/منفی/غول‌آسا)
+  function clampNum(v, min, max) {
+    v = toNum(v);
+    if (!isFinite(v)) v = 0;
+    return Math.min(max, Math.max(min, v));
+  }
+
+  var MAX_DIM = 30000;     // سقف هر بعد (میلی‌متر) = ۳۰ متر
+  var MAX_ITEMS = 1200;    // سقف تعداد قطعات در هر محاسبه
+  var MIN_DIM = 1;         // حداقل بعد معتبر قطعه (میلی‌متر)
+
+  /* ---------- آماده‌سازی ورودی ---------- */
+  // اگر هرس فعال باشد، از هر لبه «هرس + تیغه» برداشته می‌شود (برش هرس خودش تیغه مصرف می‌کند)
+  function sheetUsable(W, H, trim, k) {
+    if (trim > 0) return { w: W - 2 * (trim + k), h: H - 2 * (trim + k) };
+    return { w: W, h: H };
+  }
+
+  function prepare(sheets, panels, opt) {
+    var k = clampNum(opt.kerf, 0, 50);
+    var band = opt.banding ? clampNum(opt.bandThk, 0, 50) : 0;
+    var trim = clampNum(opt.trim, 0, 500);
+    var grain = !!opt.grain;
+    var items = [], problems = [];
+    (panels || []).forEach(function (p, pi) {
+      if (!p || typeof p !== 'object' || Array.isArray(p)) return;
+      var w = clampNum(p.w, 0, MAX_DIM) + band, h = clampNum(p.h, 0, MAX_DIM) + band;
+      var qty = Math.round(clampNum(p.qty, 0, 999));
+      if (qty <= 0 || w <= 0 || h <= 0) return;
+      if (w < MIN_DIM || h < MIN_DIM) {
+        problems.push({ label: p.label || ('قطعه ' + (pi + 1)), w: clampNum(p.w, 0, MAX_DIM), h: clampNum(p.h, 0, MAX_DIM), qty: qty,
+                        reason: 'ابعاد کمتر از ' + MIN_DIM + ' میلی‌متر' });
+        return;
+      }
+      var fits = false, i, s, u;
+      for (i = 0; i < sheets.length; i++) {
+        s = sheets[i];
+        if (clampNum(s.qty, 0, 9999) <= 0) continue;
+        u = sheetUsable(clampNum(s.w, 0, MAX_DIM), clampNum(s.h, 0, MAX_DIM), trim, k);
+        if ((w <= u.w + EPS && h <= u.h + EPS) ||
+            (!grain && h <= u.w + EPS && w <= u.h + EPS)) { fits = true; break; }
+      }
+      if (!fits) {
+        problems.push({ label: p.label || ('قطعه ' + (pi + 1)), w: clampNum(p.w, 0, MAX_DIM), h: clampNum(p.h, 0, MAX_DIM), qty: qty });
+        return;
+      }
+      for (var q = 0; q < qty; q++) {
+        items.push({ id: items.length, defId: pi, label: p.label || ('قطعه ' + (pi + 1)),
+                     w: w, h: h, nw: clampNum(p.w, 0, MAX_DIM), nh: clampNum(p.h, 0, MAX_DIM) });
+      }
+    });
+    return { items: items, problems: problems, k: k, band: band, trim: trim, grain: grain };
+  }
+
+  /* ---------- چیدمان یک ورق (بازگشتی گیوتین) ----------
+     مدل: مختصات واقعی، تیغه بعد از هر قطعه روی سمت پرت قرار می‌گیرد.
+     اگر باقیمانده عرض/ارتفاع منفی شود، برش تا لبه ورق ادامه می‌یابد (قطعه سالم می‌ماند). */
+  function packOneSheet(uw, uh, list, o, ox, oy) {
+    var placements = [];
+    var k = o.k;
+    ox = ox || 0; oy = oy || 0;
+
+    function cutNode(axis, at, len, region, children) {
+      var ids = [];
+      children.forEach(function (c) { for (var i = 0; i < c.ids.length; i++) ids.push(c.ids[i]); });
+      return { kind: 'cut', axis: axis, at: at, len: len, region: region, children: children, ids: ids };
+    }
+
+    function orientations(it) {
+      var a = [{ w: it.w, h: it.h, rot: false }];
+      if (!o.grain && it.w !== it.h) a.push({ w: it.h, h: it.w, rot: true });
+      return a;
+    }
+
+    function score(cand, r) {
+      var dw = r.w - cand.w, dh = r.h - cand.h, v;
+      if (o.heur === 'BSSF') v = Math.min(dw, dh);
+      else if (o.heur === 'BLSF') v = Math.max(dw, dh);
+      else v = dw * dh;                    // BAF: کمترین فضای باقی‌مانده
+      var b = (r.w + r.h) * 4;             // پاداش «چسبیدن کامل به لبه»
+      if (cand.w >= r.w - EPS) v -= b * 2;
+      if (cand.h >= r.h - EPS) v -= b * 2;
+      // ترجیح ملایم به قطعه بزرگ‌تر (تا قطعات بزرگ بی‌کار نمانند)
+      v -= (cand.w * cand.h) / (r.w * r.h + 1) * 3;
+      return v;
+    }
+
+    function fill(r, list) {
+      if (!list.length) return { kind: 'offcut', rect: r, ids: [] };
+      var cands = [], seen = {}, i, j, ors, c, s;
+      for (i = 0; i < list.length; i++) {
+        ors = orientations(list[i]);
+        for (j = 0; j < ors.length; j++) {
+          c = ors[j];
+          var key = c.w + 'x' + c.h;
+          if (seen[key]) continue;
+          seen[key] = 1;
+          if (c.w <= r.w + EPS && c.h <= r.h + EPS) {
+            cands.push({ c: c, it: list[i], s: score(c, r) });
+          }
+        }
+      }
+      if (!cands.length) return { kind: 'offcut', rect: r, ids: [] };
+      cands.sort(function (a, b2) { return a.s - b2.s; });
+      var pick;
+      if (o.explore > 0) {
+        // حریصانهٔ تصادفی: با شیفت توانی به سمت بهترین‌ها
+        var u = o.rng();
+        var idx = Math.floor(Math.pow(u, o.explore) * cands.length);
+        if (idx >= cands.length) idx = cands.length - 1;
+        pick = cands[idx];
+      } else {
+        pick = cands[0];
+      }
+      var best = pick.c, bestIt = pick.it;
+
+      var idx = list.indexOf(bestIt);
+      var rest = list.slice(0, idx).concat(list.slice(idx + 1));
+      var p = { id: bestIt.id, defId: bestIt.defId, label: bestIt.label,
+                x: r.x, y: r.y, w: best.w, h: best.h, rot: best.rot, nw: bestIt.nw, nh: bestIt.nh };
+      placements.push(p);
+      var pieceNode = { kind: 'piece', p: p, ids: [bestIt.id] };
+
+      var dw = r.w - best.w, dh = r.h - best.h;
+      var resW = dw - k, resH = dh - k;
+      var needV = dw > EPS, needH = dh > EPS;
+
+      if (!needV && !needH) return pieceNode;
+
+      if (needV && !needH) {
+        var right = resW > EPS ? fill({ x: r.x + best.w + k, y: r.y, w: resW, h: r.h }, rest) : { kind: 'offcut', rect: { x: r.x + best.w + k, y: r.y, w: Math.max(0, resW), h: r.h }, ids: [] };
+        return cutNode('x', r.x + best.w, r.h, r, [pieceNode, right]);
+      }
+      if (!needV && needH) {
+        var bottom = resH > EPS ? fill({ x: r.x, y: r.y + best.h + k, w: r.w, h: resH }, rest) : { kind: 'offcut', rect: { x: r.x, y: r.y + best.h + k, w: r.w, h: Math.max(0, resH) }, ids: [] };
+        return cutNode('y', r.y + best.h, r.w, r, [pieceNode, bottom]);
+      }
+
+      // هر دو جهت باقی است: دو برش پشت‌سرهم (گیوتین استاندارد)
+      var vert;
+      if (o.split === 'SAS') vert = resW <= resH;
+      else vert = resW > resH;              // LAS
+      if (o.split === 'RND') vert = o.rng() < 0.5;
+
+      if (vert) {
+        // برش ۱: عمودی در کل ارتفاع → نوار چپ + بخش راست
+        // برش ۲: افقی در نوار چپ → قطعه + بخش پایین‌چپ
+        var left = resH > EPS ? fill({ x: r.x, y: r.y + best.h + k, w: best.w, h: resH }, rest) : { kind: 'offcut', rect: { x: r.x, y: r.y + best.h + k, w: best.w, h: Math.max(0, resH) }, ids: [] };
+        var used = {}, usedArr = left.ids;
+        for (i = 0; i < usedArr.length; i++) used[usedArr[i]] = 1;
+        var rest2 = [];
+        for (i = 0; i < rest.length; i++) if (!used[rest[i].id]) rest2.push(rest[i]);
+        var rightR = resW > EPS ? fill({ x: r.x + best.w + k, y: r.y, w: resW, h: r.h }, rest2) : { kind: 'offcut', rect: { x: r.x + best.w + k, y: r.y, w: Math.max(0, resW), h: r.h }, ids: [] };
+        var inner = cutNode('y', r.y + best.h, best.w, { x: r.x, y: r.y, w: best.w, h: r.h }, [pieceNode, left]);
+        return cutNode('x', r.x + best.w, r.h, r, [inner, rightR]);
+      } else {
+        // برش ۱: افقی در کل عرض → بخش پایین + نوار بالا
+        // برش ۲: عمودی در نوار بالا → قطعه + بخش بالا-راست
+        var topRight = resW > EPS ? fill({ x: r.x + best.w + k, y: r.y, w: resW, h: best.h }, rest) : { kind: 'offcut', rect: { x: r.x + best.w + k, y: r.y, w: Math.max(0, resW), h: best.h }, ids: [] };
+        var used2 = {}, ua = topRight.ids;
+        for (i = 0; i < ua.length; i++) used2[ua[i]] = 1;
+        var rest3 = [];
+        for (i = 0; i < rest.length; i++) if (!used2[rest[i].id]) rest3.push(rest[i]);
+        var bottom2 = resH > EPS ? fill({ x: r.x, y: r.y + best.h + k, w: r.w, h: resH }, rest3) : { kind: 'offcut', rect: { x: r.x, y: r.y + best.h + k, w: r.w, h: Math.max(0, resH) }, ids: [] };
+        var inner2 = cutNode('x', r.x + best.w, best.h, { x: r.x, y: r.y, w: r.w, h: best.h }, [pieceNode, topRight]);
+        return cutNode('y', r.y + best.h, r.w, r, [inner2, bottom2]);
+      }
+    }
+
+    var root = fill({ x: ox, y: oy, w: uw, h: uh }, list);
+
+    // گردآوری برش‌ها (پیش‌ترتیب = ترتیب اجرای فیزیکی) و تکه‌های مازاد
+    var cuts = [], offcuts = [], cutLen = 0;
+    (function walk(n) {
+      if (n.kind === 'offcut') { offcuts.push(n.rect); return; }
+      if (n.kind === 'piece') return;
+      cuts.push(n);
+      for (var i = 0; i < n.children.length; i++) walk(n.children[i]);
+    })(root);
+
+    return { placements: placements, cuts: cuts, offcuts: offcuts, root: root };
+  }
+
+  /* ---------- مرتب‌سازی قطعات ---------- */
+  var ORDERS = {
+    area: function (a, b) { return (b.w * b.h) - (a.w * a.h) || Math.max(b.w, b.h) - Math.max(a.w, a.h); },
+    maxside: function (a, b) { return Math.max(b.w, b.h) - Math.max(a.w, a.h) || (b.w * b.h) - (a.w * a.h); },
+    width: function (a, b) { return b.w - a.w || b.h - a.h; },
+    height: function (a, b) { return b.h - a.h || b.w - a.w; },
+    perim: function (a, b) { return (b.w + b.h) - (a.w + a.h) || (b.w * b.h) - (a.w * a.h); }
+  };
+
+  /* ---------- حل یک ترکیب (چند ورق، چند نوع ورق) ---------- */
+  function solveOnce(items, stockTypes, opt, rng) {
+    var pool = stockTypes.map(function (s, i) { return { i: i, w: s.w, h: s.h, qty: s.qty }; });
+    var remaining = items.slice();
+    var sheets = [], guard = 0;
+
+    function lexLess(a, b) {
+      for (var i = 0; i < a.length; i++) { if (a[i] !== b[i]) return a[i] < b[i]; }
+      return false;
+    }
+
+    while (remaining.length && guard++ < 400) {
+      if (opt.oneSheet && sheets.length >= 1) {
+        return { sheets: sheets, unplaced: remaining, limited: true };
+      }
+      var bestType = -1, bestPack = null, bestScore = null;
+      for (var t = 0; t < pool.length; t++) {
+        var ty = pool[t];
+        if (ty.qty <= 0) continue;
+        var u = sheetUsable(ty.w, ty.h, opt.trim, opt.k);
+        if (u.w <= EPS || u.h <= EPS) continue;
+        // با هرس، ناحیه قابل استفاده از «هرس + تیغه» شروع می‌شود
+        var off = opt.trim > 0 ? opt.trim + opt.k : 0;
+        var pack = packOneSheet(u.w, u.h, remaining, { k: opt.k, grain: opt.grain, heur: opt.heur, split: opt.split, explore: opt.explore || 0, rng: rng }, off, off);
+        if (!pack.placements.length) continue;
+        var placedArea = 0;
+        for (var i = 0; i < pack.placements.length; i++) placedArea += pack.placements[i].w * pack.placements[i].h;
+        var sc = [-pack.placements.length, -placedArea, u.w * u.h];
+        if (bestScore === null || lexLess(sc, bestScore)) { bestScore = sc; bestType = ty; bestPack = pack; }
+      }
+      if (bestType < 0) return { sheets: sheets, unplaced: remaining };
+      bestType.qty--;
+      var placedIds = {};
+      for (i = 0; i < bestPack.placements.length; i++) placedIds[bestPack.placements[i].id] = 1;
+      remaining = remaining.filter(function (it) { return !placedIds[it.id]; });
+      sheets.push({ stockW: bestType.w, stockH: bestType.h, pack: bestPack });
+    }
+    return { sheets: sheets, unplaced: [] };
+  }
+
+  /* ---------- امتیاز کل راه‌حل بر اساس اولویت ---------- */
+  function scoreSolution(sol, opt) {
+    var usedArea = 0, placedArea = 0, cuts = 0, cutLen = 0;
+    for (var i = 0; i < sol.sheets.length; i++) {
+      var sh = sol.sheets[i];
+      usedArea += sh.stockW * sh.stockH;
+      cuts += sh.pack.cuts.length;
+      for (var j = 0; j < sh.pack.cuts.length; j++) cutLen += sh.pack.cuts[j].len;
+      for (var m = 0; m < sh.pack.placements.length; m++) placedArea += sh.pack.placements[m].w * sh.pack.placements[m].h;
+    }
+    var waste = usedArea - placedArea;
+    var unplaced = sol.unplaced.length;
+    if (opt.trim > 0) {
+      cuts += 4 * sol.sheets.length;
+      for (var i2 = 0; i2 < sol.sheets.length; i2++) cutLen += 2 * sol.sheets[i2].stockW + 2 * sol.sheets[i2].stockH;
+    }
+    var key;
+    if (opt.priority === 'cuts') key = [unplaced, cuts, waste, sol.sheets.length, cutLen];
+    else if (opt.priority === 'sheets') key = [unplaced, sol.sheets.length, waste, cuts, cutLen];
+    else key = [unplaced, waste, cuts, sol.sheets.length, cutLen];
+    return { key: key, waste: waste, cuts: cuts, cutLen: cutLen, sheetsUsed: sol.sheets.length, usedArea: usedArea, placedArea: placedArea, unplaced: unplaced };
+  }
+
+  /* ---------- جست‌وجوی ترکیب‌ها ---------- */
+  function buildCombos() {
+    var orders = ['area', 'maxside', 'height', 'width', 'perim'];
+    var heurs = ['BAF', 'BSSF', 'BLSF'];
+    var splits = ['SAS', 'LAS'];
+    var combos = [];
+    for (var oi = 0; oi < orders.length; oi++)
+      for (var hi = 0; hi < heurs.length; hi++)
+        for (var si = 0; si < splits.length; si++)
+          combos.push({ order: orders[oi], heur: heurs[hi], split: splits[si], shuffle: false });
+    return combos;
+  }
+
+  /* ---------- نقطه ورود اصلی ---------- */
+  function optimize(input) {
+    var t0 = Date.now();
+    var rawOpt = input.opt || {};
+    // پالایش گزینه‌ها (در برابر مقادیر منفی/غول‌آسا/نوع اشتباه)
+    var opt = {
+      kerf: clampNum(rawOpt.kerf, 0, 50),
+      bandThk: clampNum(rawOpt.bandThk, 0, 50),
+      trim: clampNum(rawOpt.trim, 0, 500),
+      minOffcutLabel: clampNum(rawOpt.minOffcutLabel, 0, 10000),
+      banding: !!rawOpt.banding, grain: !!rawOpt.grain, oneSheet: !!rawOpt.oneSheet,
+      priority: ['waste', 'cuts', 'sheets'].indexOf(rawOpt.priority) >= 0 ? rawOpt.priority : 'waste',
+      quality: ['fast', 'normal', 'high'].indexOf(rawOpt.quality) >= 0 ? rawOpt.quality : 'normal',
+      unit: rawOpt.unit, decimals: rawOpt.decimals, labels: !!rawOpt.labels
+    };
+    var prep = prepare(input.sheets || [], input.panels || [], opt);
+
+    if (prep.items.length > MAX_ITEMS) {
+      return { error: 'بیش از ' + MAX_ITEMS + ' قطعه در یک محاسبه مجاز نیست. تعداد را کمتر کنید.', elapsed: Date.now() - t0 };
+    }
+    if (!prep.items.length) {
+      return { empty: true, problems: prep.problems, elapsed: Date.now() - t0 };
+    }
+
+    var stockTypes = (input.sheets || []).filter(function (s) { return s && typeof s === 'object' && !Array.isArray(s); })
+      .map(function (s) { return { w: clampNum(s.w, 0, MAX_DIM), h: clampNum(s.h, 0, MAX_DIM), qty: Math.round(clampNum(s.qty, 0, 9999)) }; })
+      .filter(function (s) { return s.w > 0 && s.h > 0 && s.qty > 0; });
+
+    var budgetMs = { fast: 500, normal: 1800, high: 4000 }[opt.quality || 'normal'] || 1800;
+    var rndCount = { fast: 120, normal: 500, high: 1000 }[opt.quality || 'normal'] || 500;
+
+    var combos = buildCombos();
+    var bestSol = null, bestScore = null, tried = 0, seed = 1234567;
+
+    function tryCombo(c, shuffle) {
+      tried++;
+      var rng = mulberry32(seed + tried * 7919);
+      var list = prep.items.slice();
+      if (shuffle) {
+        for (var i = list.length - 1; i > 0; i--) {
+          var j = Math.floor(rng() * (i + 1));
+          var tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+        }
+      } else {
+        list.sort(ORDERS[c.order]);
+      }
+      var sol = solveOnce(list, stockTypes, {
+        k: prep.k, trim: prep.trim, grain: prep.grain, oneSheet: !!opt.oneSheet,
+        priority: opt.priority || 'waste',
+        heur: c.heur, split: shuffle ? 'RND' : c.split, explore: shuffle ? (c.explore || 0) : 0, rng: rng
+      }, rng);
+      var sc = scoreSolution(sol, { priority: opt.priority || 'waste', trim: prep.trim });
+      if (bestScore === null || (function (a, b) { for (var i = 0; i < a.length; i++) { if (a[i] !== b[i]) return a[i] < b[i]; } return false; })(sc.key, bestScore.key)) {
+        bestSol = sol; bestScore = sc;
+      }
+    }
+
+    // ابتدا همه ترکیب‌های قطعی، سپس ترکیب‌های تصادفی تا سقف بودجه
+    var maxTotal = prep.items.length > 250 ? 40 : (prep.items.length > 120 ? 150 : combos.length + rndCount);
+    for (var i = 0; i < combos.length; i++) {
+      if (i >= 6 && Date.now() - t0 > budgetMs && bestSol) break;
+      tryCombo(combos[i], false);
+    }
+    for (var r = 0; r < rndCount && tried < maxTotal; r++) {
+      if (Date.now() - t0 > budgetMs && bestSol) break;
+      tryCombo({ order: 'area', heur: ['BAF', 'BSSF', 'BLSF'][r % 3], split: r % 2 ? 'SAS' : 'LAS', explore: 1.1 + (r % 8) * 0.45 }, true);
+    }
+
+    // نتیجه نهایی: ساخت آمار هر ورق + برش‌های هرس
+    var fmtSheets = [];
+    var totalCuts = 0, totalCutLen = 0, totalUsedArea = 0, totalPanelsAreaNominal = 0, totalOffcuts = 0;
+    var usedTypes = {};
+
+    for (var si2 = 0; si2 < bestSol.sheets.length; si2++) {
+      var sh2 = bestSol.sheets[si2];
+      var sheetArea = sh2.stockW * sh2.stockH;
+      var panelsNominal = 0, panelsCount = sh2.pack.placements.length;
+      for (var m2 = 0; m2 < sh2.pack.placements.length; m2++) panelsNominal += sh2.pack.placements[m2].nw * sh2.pack.placements[m2].nh;
+
+      var rows = [];
+      var tc = prep.trim;
+      if (tc > 0) {
+        rows.push({ kind: 'trim', label: 'هرس لبه راست/چپ', axis: 'x', atRel: tc, len: sh2.stockH, note: 'از هر طرف عرض' });
+        rows.push({ kind: 'trim', label: 'هرس لبه بالا/پایین', axis: 'y', atRel: tc, len: sh2.stockW, note: 'از هر طرف طول' });
+      }
+      for (var ci = 0; ci < sh2.pack.cuts.length; ci++) {
+        var c2 = sh2.pack.cuts[ci];
+        var atRel = c2.axis === 'x' ? (c2.at - c2.region.x) : (c2.at - c2.region.y);
+        var result = c2.children.map(function (ch) {
+          if (ch.kind === 'piece') return { kind: 'piece', w: ch.p.w, h: ch.p.h };
+          if (ch.kind === 'offcut') return { kind: 'waste', w: Math.max(0, ch.rect.w), h: Math.max(0, ch.rect.h) };
+          return { kind: 'part', w: ch.region.w, h: ch.region.h };
+        });
+        rows.push({ kind: 'cut', axis: c2.axis, atRel: atRel, len: c2.len, region: c2.region, result: result });
+      }
+
+      var cutCount = rows.length, cutLen = 0;
+      for (var ri = 0; ri < rows.length; ri++) cutLen += rows[ri].len;
+      var offc = sh2.pack.offcuts.filter(function (o2) { return o2.w > EPS && o2.h > EPS; });
+      var typeKey = sh2.stockW + '×' + sh2.stockH;
+      usedTypes[typeKey] = (usedTypes[typeKey] || 0) + 1;
+
+      fmtSheets.push({
+        idx: si2 + 1, stockW: sh2.stockW, stockH: sh2.stockH, trim: prep.trim, kerf: prep.k,
+        placements: sh2.pack.placements,
+        cutRows: rows, cuts: cutCount, cutLen: cutLen,
+        offcuts: offc,
+        panelsCount: panelsCount, panelsArea: panelsNominal,
+        usedArea: sheetArea, wasteArea: sheetArea - panelsNominal,
+        usagePct: sheetArea > 0 ? panelsNominal / sheetArea : 0
+      });
+
+      totalCuts += cutCount; totalCutLen += cutLen;
+      totalUsedArea += sheetArea; totalPanelsAreaNominal += panelsNominal;
+      totalOffcuts += offc.length;
+    }
+
+    var placedNominal = totalPanelsAreaNominal;
+    var unplacedList = bestSol.unplaced.map(function (it) { return { label: it.label, w: it.nw, h: it.nh }; });
+    // تجمیع قطعات نچیده‌شده بر اساس اندازه
+    var unplacedAgg = {};
+    unplacedList.forEach(function (u2) {
+      var kk = u2.label + '|' + u2.w + '×' + u2.h;
+      unplacedAgg[kk] = unplacedAgg[kk] || { label: u2.label, w: u2.w, h: u2.h, qty: 0 };
+      unplacedAgg[kk].qty++;
+    });
+
+    return {
+      empty: false,
+      sheets: fmtSheets,
+      totals: {
+        sheetsUsed: fmtSheets.length,
+        usedTypes: usedTypes,
+        usedArea: totalUsedArea,
+        panelsArea: placedNominal,
+        wasteArea: totalUsedArea - placedNominal,
+        usagePct: totalUsedArea > 0 ? placedNominal / totalUsedArea : 0,
+        cuts: totalCuts,
+        cutLen: totalCutLen,
+        offcuts: totalOffcuts,
+        unplaced: Object.keys(unplacedAgg).map(function (kk) { return unplacedAgg[kk]; }),
+        limited: !!bestSol.limited
+      },
+      problems: prep.problems,
+      kerf: prep.k, band: prep.band, trim: prep.trim, grain: prep.grain,
+      priority: opt.priority || 'waste',
+      tried: tried,
+      elapsed: Date.now() - t0
+    };
+  }
+
+  var api = {
+    optimize: optimize,
+    prepare: prepare,
+    sheetUsable: sheetUsable,
+    packOneSheet: packOneSheet,
+    toNum: toNum,
+    UNITS: UNITS,
+    EPS: EPS
+  };
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.CutCore = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* ============================================================
+   برش‌یار — رندر گرافیکی نقشه برش (SVG)، جداول و خروجی‌ها
+   ============================================================ */
+(function (root) {
+  'use strict';
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function palette(defId) {
+    var h = (defId * 47 + 195) % 360;
+    return { fill: 'hsl(' + h + ',68%,88%)', stroke: 'hsl(' + h + ',52%,48%)' };
+  }
+
+  /* ---------- SVG یک ورق ---------- */
+  function sheetSVG(sheet, opt, F, ex) {
+    ex = ex || {};
+    var W = sheet.stockW, H = sheet.stockH;
+    var sheetMin = Math.min(W, H);
+    var M = clamp(sheetMin * 0.07, 34, 78);           // حاشیه خطوط اندازه
+    var fs = clamp(sheetMin / 30, 15, 64);            // اندازه متن پایه
+    var sw = clamp(sheetMin / 500, 1.2, 4);           // ضخامت خطوط
+    var uid = (sheet.idx || 1) + '_' + (ex.rnd || Math.floor(Math.random() * 1e6));
+    var P = [];
+
+    P.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + (-M) + ' ' + (-M) + ' ' + (W + 2 * M) + ' ' + (H + 2 * M) + '"' +
+      ' width="' + Math.round(W + 2 * M) + '" height="' + Math.round(H + 2 * M) + '"' +
+      ' font-family="Vazirmatn, Tahoma, sans-serif" role="img">');
+    if (ex.embedFont && ex.fontCSS) P.push('<defs><style>' + ex.fontCSS + '</style>' +
+      '<marker id="a1' + uid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#dc2626"/></marker></defs>');
+    else P.push('<defs><marker id="a1' + uid + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#dc2626"/></marker></defs>');
+
+    // بدنه ورق
+    P.push('<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#ffffff" stroke="#0f172a" stroke-width="' + (sw * 1.6) + '"/>');
+
+    // ناحیه قابل استفاده پس از هرس
+    if (sheet.trim > 0) {
+      var uo = sheet.trim + sheet.kerf;
+      var uW = W - 2 * uo, uH = H - 2 * uo;
+      P.push('<rect x="' + uo + '" y="' + uo + '" width="' + uW + '" height="' + uH + '" fill="none" stroke="#0284c7" stroke-width="' + sw + '" stroke-dasharray="' + (sheetMin / 60) + ' ' + (sheetMin / 90) + '" opacity="0.9"/>');
+    }
+
+    // تکه‌های مازاد
+    sheet.offcuts.forEach(function (o) {
+      if (o.w <= 0.01 || o.h <= 0.01) return;
+      P.push('<rect x="' + o.x + '" y="' + o.y + '" width="' + o.w + '" height="' + o.h + '" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="' + sw + '" stroke-dasharray="' + (sheetMin / 45) + ' ' + (sheetMin / 70) + '"/>');
+      if (Math.min(o.w, o.h) >= (opt.minOffcutLabel || 120)) {
+        var t = F.dim(o.w) + '×' + F.dim(o.h);
+        P.push('<text x="' + (o.x + o.w / 2) + '" y="' + (o.y + o.h / 2) + '" font-size="' + (fs * 0.72) + '" fill="#94a3b8" text-anchor="middle" dominant-baseline="central" style="direction:ltr">' + t + '</text>');
+      }
+    });
+
+    // قطعات
+    sheet.placements.forEach(function (p) {
+      var col = palette(p.defId);
+      P.push('<rect x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '" fill="' + col.fill + '" stroke="' + col.stroke + '" stroke-width="' + (sw * 1.35) + '"/>');
+
+      if (opt.grain) { // جهت رگه: خطوط ظریف در امتداد طول قطعه
+        var horiz = p.w >= p.h, g = [];
+        for (var gi = 1; gi <= 2; gi++) {
+          var f = gi / 3;
+          if (horiz) g.push('<line x1="' + (p.x + p.w * 0.12) + '" y1="' + (p.y + p.h * f) + '" x2="' + (p.x + p.w * 0.88) + '" y2="' + (p.y + p.h * f) + '"/>');
+          else g.push('<line x1="' + (p.x + p.w * f) + '" y1="' + (p.y + p.h * 0.12) + '" x2="' + (p.x + p.w * f) + '" y2="' + (p.y + p.h * 0.88) + '"/>');
+        }
+        P.push('<g stroke="#334155" stroke-width="' + (sw * 0.6) + '" opacity="0.18">' + g.join('') + '</g>');
+      }
+
+      if (opt.banding) { // حاشیه لبه‌چسبانی
+        var bv = clamp(sheetMin / 220, sw * 1.4, 7);
+        P.push('<rect x="' + (p.x + bv / 2) + '" y="' + (p.y + bv / 2) + '" width="' + (p.w - bv) + '" height="' + (p.h - bv) + '" fill="none" stroke="#0284c7" stroke-width="' + bv + '" opacity="0.85"/>');
+      }
+
+      // متن ابعاد + برچسب
+      var dimStr = F.dim(p.w) + '×' + F.dim(p.h);
+      var labStr = opt.labels ? (p.label || '') : '';
+      var twoLine = !!labStr;
+      var lineH = fs * (twoLine ? 1.95 : 1.15);
+      var needW = dimStr.length * fs * 0.58;
+      var cx = p.x + p.w / 2, cy = p.y + p.h / 2;
+      var rotate = false, useFs = fs;
+      if (p.w < needW + fs * 0.6 && p.h > p.w) { rotate = true; needW = dimStr.length * fs * 0.58; }
+      var avail = rotate ? p.h : p.w;
+      if (needW > avail - fs * 0.5) {
+        useFs = Math.max(fs * 0.4, Math.min(fs, (avail - fs * 0.4) / (dimStr.length * 0.58)));
+      }
+      var fitsH = lineH <= p.h - fs * 0.3 && useFs * dimStr.length * 0.58 <= avail - fs * 0.3;
+      if (rotate) fitsH = lineH <= p.w - fs * 0.3 && useFs * dimStr.length * 0.58 <= p.h - fs * 0.3;
+      if (fitsH) {
+        var t1 = '<text x="' + cx + '" y="' + cy + '" font-size="' + useFs + '" font-weight="700" fill="#111827" text-anchor="middle" dominant-baseline="central" style="direction:ltr"' +
+          (rotate ? ' transform="rotate(-90 ' + cx + ' ' + cy + ')"' : '') + '>' + dimStr + '</text>';
+        P.push(t1);
+        if (twoLine && p.h > useFs * 2.9 && (rotate ? p.w > useFs * 2.6 : p.w > useFs * 2.6)) {
+          var off = useFs * 1.05;
+          var ly = rotate ? cy - off : cy - off;
+          var lx = rotate ? cx + off : cx;
+          var rot2 = rotate ? ' transform="rotate(-90 ' + lx + ' ' + ly + ')"' : '';
+          P.push('<text x="' + lx + '" y="' + ly + '" font-size="' + (useFs * 0.72) + '" font-weight="500" fill="#374151" text-anchor="middle" dominant-baseline="central" style="direction:rtl"' + rot2 + '>' + escapeXML(labStr) + '</text>');
+        }
+      }
+    });
+
+    // خطوط اندازه مرجع (زیر و راست ورق)
+    var dy = H + M * 0.42, dx2 = W + M * 0.42;
+    var dimSw = clamp(sheetMin / 700, 1, 2.6);
+    P.push('<g stroke="#dc2626" stroke-width="' + dimSw + '">'
+      + '<line x1="0" y1="' + (H + 4) + '" x2="0" y2="' + (dy + 4) + '"/><line x1="' + W + '" y1="' + (H + 4) + '" x2="' + W + '" y2="' + (dy + 4) + '"/>'
+      + '<line x1="0" y1="' + dy + '" x2="' + W + '" y2="' + dy + '" marker-start="url(#a1' + uid + ')" marker-end="url(#a1' + uid + ')"/>'
+      + '<line x1="' + (W + 4) + '" y1="0" x2="' + (dx2 + 4) + '" y2="0"/><line x1="' + (W + 4) + '" y1="' + H + '" x2="' + (dx2 + 4) + '" y2="' + H + '"/>'
+      + '<line x1="' + dx2 + '" y1="0" x2="' + dx2 + '" y2="' + H + '" marker-start="url(#a1' + uid + ')" marker-end="url(#a1' + uid + ')"/>'
+      + '</g>');
+    P.push('<text x="' + (W / 2) + '" y="' + (dy + fs * 0.95) + '" font-size="' + (fs * 0.85) + '" font-weight="700" fill="#dc2626" text-anchor="middle" style="direction:ltr">' + F.dim(W) + '</text>');
+    P.push('<text x="' + (dx2 + fs * 0.95) + '" y="' + (H / 2) + '" font-size="' + (fs * 0.85) + '" font-weight="700" fill="#dc2626" text-anchor="middle" style="direction:ltr" transform="rotate(90 ' + (dx2 + fs * 0.95) + ' ' + (H / 2) + ')">' + F.dim(H) + '</text>');
+
+    P.push('</svg>');
+    return P.join('');
+  }
+
+  function escapeXML(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ---------- جدول دستورالعمل برش ---------- */
+  function cutTableHTML(sheet, F) {
+    var rows = [];
+    sheet.cutRows.forEach(function (r, i) {
+      var dir, at, region, res;
+      if (r.kind === 'trim') {
+        dir = '<span class="tag trim">هرس</span>';
+        at = '<span class="num">' + (r.axis === 'x' ? 'x' : 'y') + ' = ' + F.dim(r.atRel) + '</span><br><span class="r">' + r.note + '</span>';
+        region = 'کل ورق';
+        res = '<span class="r">حذف حاشیه لبه</span>';
+      } else {
+        region = '<span class="num">' + F.dim(r.region.w) + '×' + F.dim(r.region.h) + '</span>';
+        dir = r.axis === 'x' ? 'عمودی' : 'افقی';
+        at = '<span class="num">' + (r.axis === 'x' ? 'x' : 'y') + ' = ' + F.dim(r.atRel) + '</span><br><span class="r">' + (r.axis === 'x' ? 'از لبه چپ بخش' : 'از لبه بالا بخش') + '</span>';
+        res = r.result.map(function (c) {
+          var tag = c.kind === 'piece' ? '<span class="tag piece">قطعه</span>'
+            : c.kind === 'waste' ? '<span class="tag waste">مازاد</span>'
+            : '<span class="tag part">بخش</span>';
+          return tag + ' <span class="num">' + F.dim(c.w) + '×' + F.dim(c.h) + '</span>';
+        }).join(' &nbsp;|&nbsp; ');
+      }
+      rows.push('<tr><td>' + (i + 1) + '</td><td>' + region + '</td><td>' + dir + '</td><td>' + at + '</td><td>' + res + '</td><td class="num">' + F.dim(r.len) + '</td></tr>');
+    });
+    return '<div class="table-wrap"><table class="cut-table"><thead><tr>' +
+      '<th>#</th><th>بخش قبل از برش</th><th>جهت</th><th>محل برش</th><th>نتیجه</th><th>طول برش</th>' +
+      '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+
+  /* ---------- آمار یک ورق ---------- */
+  function sheetStatsHTML(sheet, F) {
+    return '<div class="sheet-stats">' +
+      '<span>قطعات: <b>' + F.n(sheet.panelsCount) + '</b></span>' +
+      '<span>برش‌ها: <b>' + F.n(sheet.cuts) + '</b></span>' +
+      '<span>طول کل برش: <b>' + F.len(sheet.cutLen) + '</b></span>' +
+      '<span>تکه مازاد: <b>' + F.n(sheet.offcuts.length) + '</b></span>' +
+      '<span>پرت این ورق: <b>' + F.area(sheet.wasteArea) + '</b></span>' +
+      '<span>بهره‌وری: <b>' + F.pct(sheet.usagePct) + '</b></span>' +
+      '</div>';
+  }
+
+  /* ---------- کارت کامل یک ورق ---------- */
+  function sheetCardHTML(sheet, opt, F) {
+    return '<div class="sheet-card" data-sheet="' + sheet.idx + '">' +
+      '<div class="sheet-head">' +
+      '<h3>ورق ' + F.n(sheet.idx) + ' <span class="badge num">' + F.dim(sheet.stockW) + ' × ' + F.dim(sheet.stockH) + '</span>' +
+      '<span class="badge green">بهره‌وری ' + F.pct(sheet.usagePct) + '</span></h3>' +
+      '<div class="sheet-actions no-print">' +
+      '<button class="btn exp" data-exp="png" data-sheet="' + sheet.idx + '"><svg class="ic"><use href="#i-image"/></svg>PNG</button>' +
+      '<button class="btn exp" data-exp="jpg" data-sheet="' + sheet.idx + '"><svg class="ic"><use href="#i-image"/></svg>JPG</button>' +
+      '</div></div>' +
+      '<div class="sheet-svg">' + sheetSVG(sheet, opt, F) + '</div>' +
+      sheetStatsHTML(sheet, F) +
+      '<details class="cuts"><summary><svg class="ic"><use href="#i-cut-list"/></svg> دستورالعمل برش (' + F.n(sheet.cuts) + ' مرحله) <span class="chev"><svg class="ic"><use href="#i-chev"/></svg></span></summary>' +
+      cutTableHTML(sheet, F) + '</details></div>';
+  }
+
+  /* ---------- ردیف‌های آمار کلی (مشترک بین صفحه و چاپ) ---------- */
+  function statsRows(result, F, labels) {
+    var t = result.totals;
+    var usedTypesStr = Object.keys(t.usedTypes).map(function (kk) {
+      return '<span class="num">' + kk + '</span> ×' + F.n(t.usedTypes[kk]);
+    }).join(' ، ');
+    return [
+      ['ورق‌های مصرف‌شده', usedTypesStr],
+      ['مساحت کل قطعات', F.area(t.panelsArea) + ' <span class="dim">(' + F.pct(t.usagePct) + ' از ورق‌ها)</span>'],
+      ['مساحت کل ورق‌های مصرفی', F.area(t.usedArea)],
+      ['مساحت کل پرت', F.area(t.wasteArea) + ' <span class="dim">(' + F.pct(t.usedArea > 0 ? t.wasteArea / t.usedArea : 0) + ')</span>'],
+      ['تعداد کل برش‌ها', F.n(t.cuts)],
+      ['طول کل برش‌ها', F.len(t.cutLen)],
+      ['تکه‌های مازاد (بغل‌برش)', F.n(t.offcuts)],
+      ['ضخامت تیغه (Kerf)', t.kerf > 0 ? F.len(result.kerf) : '۰'],
+      ['اولویت بهینه‌سازی', labels[result.priority] || ''],
+      ['هرس لبه', result.trim > 0 ? F.len(result.trim) + ' از هر طرف' : 'ندارد']
+    ];
+  }
+
+  /* ---------- آمار کلی ---------- */
+  function globalStatsHTML(result, F, labels) {
+    return statsRows(result, F, labels).map(function (r) {
+      return '<div class="stat-row"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>';
+    }).join('');
+  }
+
+  /* ---------- چاپ ---------- */
+  function buildPrintHTML(result, opt, F, paramsLine) {
+    var NOTICE = '⚠ توجه: این نقشه یک راهنمای محاسبه حدودی است؛ برای نتیجه نهایی و دقیق، نقشه را با برش‌کار خود یا دستگاه کات‌مستر (CNC) نهایی کنید و برش‌های واقعی را طبق همان انجام دهید.';
+    var out = '<h1>نقشه برش — برش‌یار</h1><div class="p-meta">' + paramsLine + '</div>' +
+      '<div class="p-notice">' + NOTICE + '</div>';
+    out += '<table><tbody>' + statsRows(result, F, { waste: 'کمترین پرت', cuts: 'کمترین تعداد برش', sheets: 'کمترین تعداد ورق' }).map(function (r) {
+      return '<tr><td style="color:#64748b">' + r[0].replace(/<[^>]+>/g, '') + '</td><td>' + r[1] + '</td></tr>';
+    }).join('') + '</tbody></table>';
+    result.sheets.forEach(function (sh) {
+      out += '<div class="p-sheet"><h2>ورق ' + F.n(sh.idx) + ' (' + F.dim(sh.stockW) + ' × ' + F.dim(sh.stockH) + ') — بهره‌وری ' + F.pct(sh.usagePct) + '</h2>' +
+        sheetSVG(sh, opt, F, { rnd: 9999 }) +
+        '<table><thead><tr><th>#</th><th>بخش قبل از برش</th><th>جهت</th><th>محل برش</th><th>نتیجه</th><th>طول برش</th></tr></thead><tbody>' +
+        sh.cutRows.map(function (r, i) {
+          if (r.kind === 'trim') return '<tr><td>' + (i + 1) + '</td><td>کل ورق</td><td>هرس</td><td>' + (r.axis === 'x' ? 'x' : 'y') + ' = ' + F.dim(r.atRel) + '</td><td>حذف حاشیه لبه</td><td>' + F.dim(r.len) + '</td></tr>';
+          var res = r.result.map(function (c) {
+            var name = c.kind === 'piece' ? 'قطعه' : c.kind === 'waste' ? 'مازاد' : 'بخش';
+            return name + ' ' + F.dim(c.w) + '×' + F.dim(c.h);
+          }).join(' | ');
+          return '<tr><td>' + (i + 1) + '</td><td>' + F.dim(r.region.w) + '×' + F.dim(r.region.h) + '</td><td>' + (r.axis === 'x' ? 'عمودی' : 'افقی') + '</td><td>' + (r.axis === 'x' ? 'x' : 'y') + ' = ' + F.dim(r.atRel) + '</td><td>' + res + '</td><td>' + F.dim(r.len) + '</td></tr>';
+        }).join('') +
+        '</tbody></table></div>';
+    });
+    out += '<div class="p-notice" style="margin-top:14px">' + NOTICE + '</div>';
+    return out;
+  }
+
+  /* ---------- خروجی تصویر ---------- */
+  /* ---------- فونت برای رستر SVG: تبدیل فونت خارجی به data: (یک‌بار کش می‌شود) ---------- */
+  function bufToB64(buf) {
+    var bytes = new Uint8Array(buf), bin = '', CH = 0x8000;
+    for (var i = 0; i < bytes.length; i += CH) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+    }
+    return btoa(bin);
+  }
+
+  function ensureFontDataCSS() {
+    var css = root.FONT_FACE_CSS || '';
+    if (!css || css.indexOf('data:') !== -1) return Promise.resolve(css); // نسخه تک‌فایلی
+    if (root.__fontDataCSS) return Promise.resolve(root.__fontDataCSS);
+    var urls = [], re = /url\('([^']+)'\)/g, m;
+    while ((m = re.exec(css))) {
+      if (m[1].indexOf('data:') !== 0) urls.push(m[1]);
+    }
+    if (!urls.length) return Promise.resolve(css);
+    var done = 0, failed = false;
+    return new Promise(function (resolve) {
+      urls.forEach(function (u) {
+        var abs;
+        try { abs = new URL(u, location.href).href; } catch (e) { abs = u; }
+        fetch(abs)
+          .then(function (r) { return r.arrayBuffer(); })
+          .then(function (buf) {
+            css = css.replace(u, 'data:font/woff2;base64,' + bufToB64(buf));
+            done++;
+            if (done === urls.length && !failed) { root.__fontDataCSS = css; resolve(css); }
+          })
+          .catch(function () {
+            failed = true;              // بدون فونت جاسازی‌شده ادامه بده (فقط پیش‌نمایش لوکال)
+            resolve(css);
+          });
+      });
+    });
+  }
+
+  function exportSheetImage(sheet, opt, F, type) {
+    ensureFontDataCSS().then(function (fontCSS) {
+      var svg = sheetSVG(sheet, opt, F, { embedFont: true, fontCSS: fontCSS, rnd: 7777 + sheet.idx });
+      var blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        var scale = clamp(2200 / Math.max(img.naturalWidth, 1), 1, 4);
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * scale);
+        c.height = Math.round(img.naturalHeight * scale);
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function (b) {
+          downloadBlob(b, 'cutyar-sheet-' + sheet.idx + '.' + (type === 'jpg' ? 'jpg' : 'png'));
+        }, type === 'jpg' ? 'image/jpeg' : 'image/png', 0.92);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); toastErr('خطا در ساخت تصویر'); };
+      img.src = url;
+    });
+  }
+
+  function toastErr(msg) {
+    if (typeof window !== 'undefined' && window.CutUI && window.CutUI.toast) window.CutUI.toast(msg, true);
+    else if (typeof window !== 'undefined' && window.toast) window.toast(msg, true);
+  }
+
+  function downloadBlob(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  }
+
+  root.CutRender = {
+    sheetSVG: sheetSVG,
+    cutTableHTML: cutTableHTML,
+    sheetStatsHTML: sheetStatsHTML,
+    sheetCardHTML: sheetCardHTML,
+    globalStatsHTML: globalStatsHTML,
+    buildPrintHTML: buildPrintHTML,
+    exportSheetImage: exportSheetImage,
+    ensureFontDataCSS: ensureFontDataCSS,
+    palette: palette,
+    downloadBlob: downloadBlob
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* ============================================================
+   برش‌یار — رابط کاربری، وضعیت، واحدها و رویدادها
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var $ = function (sel) { return document.querySelector(sel); };
+  var CORE = window.CutCore, R = window.CutRender;
+  var LS_KEY = 'cutyar-v1';
+
+  var UNIT_LABEL = { mm: 'میلی‌متر', cm: 'سانتی‌متر', m: 'متر', in: 'اینچ' };
+  var PRIO_LABELS = { waste: 'کمترین پرت (مساحت)', cuts: 'کمترین تعداد برش', sheets: 'کمترین تعداد ورق' };
+
+  var DEFAULT_OPT = { kerf: 0, labels: true, oneSheet: false, grain: false, banding: false, bandThk: 1,
+                      priority: 'waste', quality: 'normal', unit: 'mm', decimals: 1, trim: 0, minOffcutLabel: 120 };
+
+  var state = { sheets: [], panels: [], opt: JSON.parse(JSON.stringify(DEFAULT_OPT)) };
+  var nextId = 1;
+  var lastResult = null, lastInput = null;
+
+  /* ---------- پالایش امن داده‌ها (localStorage/فایل JSON می‌توانند دستکاری شده باشند) ---------- */
+  function sanitizeOpt(raw) {
+    var o = JSON.parse(JSON.stringify(DEFAULT_OPT));
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return o;
+    function num(v, min, max, dflt) {
+      v = CORE.toNum(v);
+      if (!isFinite(v)) return dflt;
+      return Math.min(max, Math.max(min, v));
+    }
+    o.kerf = num(raw.kerf, 0, 50, 0);
+    o.bandThk = num(raw.bandThk, 0, 50, 1);
+    o.trim = num(raw.trim, 0, 500, 0);
+    o.minOffcutLabel = num(raw.minOffcutLabel, 0, 10000, 120);
+    o.labels = !!raw.labels;
+    o.oneSheet = !!raw.oneSheet;
+    o.grain = !!raw.grain;
+    o.banding = !!raw.banding;
+    o.priority = ['waste', 'cuts', 'sheets'].indexOf(raw.priority) >= 0 ? raw.priority : 'waste';
+    o.quality = ['fast', 'normal', 'high'].indexOf(raw.quality) >= 0 ? raw.quality : 'normal';
+    o.unit = ['mm', 'cm', 'm', 'in'].indexOf(raw.unit) >= 0 ? raw.unit : 'mm';
+    o.decimals = num(raw.decimals, 0, 3, 1) | 0;
+    return o;
+  }
+
+  function sanitizeRows(raw, kind) {
+    var out = [];
+    if (Array.isArray(raw)) {
+      raw.slice(0, 200).forEach(function (r) {
+        if (!r || typeof r !== 'object' || Array.isArray(r)) return;
+        var w = CORE.toNum(r.w), h = CORE.toNum(r.h), q = Math.round(CORE.toNum(r.qty));
+        var row = { id: nextId++ };
+        if (kind === 'panel') row.label = String(r.label == null ? '' : r.label).slice(0, 60);
+        row.w = (w > 0 && w <= 30000) ? w : null;
+        row.h = (h > 0 && h <= 30000) ? h : null;
+        row.qty = (q > 0 && q <= 999) ? q : 1;
+        out.push(row);
+      });
+    }
+    if (!out.length) {
+      out.push(kind === 'panel' ? { id: nextId++, label: '', w: null, h: null, qty: 1 }
+                                : { id: nextId++, w: null, h: null, qty: 1 });
+    }
+    return out;
+  }
+
+  /* ---------- قالب‌بندی اعداد ---------- */
+  function round3(x) { return Math.round(x * 1000) / 1000; }
+
+  function makeF(opt) {
+    var f = CORE.UNITS[opt.unit] || 1;
+    var d = Math.max(0, Math.min(3, opt.decimals | 0));
+    var nf = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: d });
+    var nfA = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 });
+    var nfP = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 });
+    return {
+      factor: f,
+      dim: function (mm) { return nf.format(round3(mm / f)); },
+      len: function (mm) { return nf.format(round3(mm / f)) + ' ' + UNIT_LABEL[opt.unit]; },
+      area: function (mm2) { return nfA.format(mm2 / 1e6) + ' م²'; },
+      pct: function (x) { return nfP.format(x * 100) + '٪'; },
+      n: function (v) { return new Intl.NumberFormat('fa-IR').format(v); }
+    };
+  }
+
+  /* ---------- ذخیره‌سازی ---------- */
+  var saveTimer = null;
+  function saveState() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+    }, 350);
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (!raw) return false;
+      var s = JSON.parse(raw);
+      if (!s || typeof s !== 'object') return false;
+      state.opt = sanitizeOpt(s.opt);
+      nextId = isFinite(+s.nextId) ? Math.min(1e9, Math.max(1, Math.round(+s.nextId))) : 1;
+      state.sheets = sanitizeRows(s.sheets, 'stock');
+      state.panels = sanitizeRows(s.panels, 'panel');
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function sampleState() {
+    nextId = 1;
+    state.opt = Object.assign(JSON.parse(JSON.stringify(DEFAULT_OPT)), { kerf: 3 });
+    state.sheets = [{ id: nextId++, w: 2440, h: 1220, qty: 3 }];
+    state.panels = [
+      { id: nextId++, label: 'درگاه کابینت', w: 720, h: 420, qty: 2 },
+      { id: nextId++, label: 'بدنه کابینت', w: 720, h: 560, qty: 2 },
+      { id: nextId++, label: 'طبقه', w: 600, h: 350, qty: 3 },
+      { id: nextId++, label: 'پشت‌بند', w: 1200, h: 300, qty: 2 }
+    ];
+  }
+
+  function blankState() {
+    nextId = 1;
+    state.opt = JSON.parse(JSON.stringify(DEFAULT_OPT));
+    state.sheets = [{ id: nextId++, w: null, h: null, qty: 1 }];
+    state.panels = [{ id: nextId++, label: '', w: null, h: null, qty: 1 }];
+  }
+
+  /* ---------- رندر ردیف‌های ورودی ---------- */
+  function disp(mm) { return (mm == null || mm === '') ? '' : round3(mm / F.factor); }
+
+  var F; // قالب‌بند فعلی — قبل از استفاده ساخته می‌شود
+
+  function renderRows() {
+    F = makeF(state.opt);
+    $('#panelRows').innerHTML = state.panels.map(function (p) {
+      return '<div class="row row-panel" data-kind="panel" data-id="' + p.id + '">' +
+        '<input class="field f-label" data-f="label" placeholder="مثلاً درگاه کابینت" value="' + esc(p.label || '') + '">' +
+        '<input class="field num f-w" data-f="w" type="number" min="0" step="any" placeholder="طول" value="' + disp(p.w) + '">' +
+        '<input class="field num f-h" data-f="h" type="number" min="0" step="any" placeholder="عرض" value="' + disp(p.h) + '">' +
+        '<input class="field num f-qty" data-f="qty" type="number" min="1" step="1" value="' + (p.qty || 1) + '">' +
+        '<button class="row-del" title="حذف ردیف"><svg class="ic"><use href="#i-trash"/></svg></button></div>';
+    }).join('');
+    $('#stockRows').innerHTML = state.sheets.map(function (s) {
+      return '<div class="row row-stock" data-kind="stock" data-id="' + s.id + '">' +
+        '<input class="field num f-w" data-f="w" type="number" min="0" step="any" placeholder="طول" value="' + disp(s.w) + '">' +
+        '<input class="field num f-h" data-f="h" type="number" min="0" step="any" placeholder="عرض" value="' + disp(s.h) + '">' +
+        '<input class="field num f-qty" data-f="qty" type="number" min="1" step="1" value="' + (s.qty || 1) + '">' +
+        '<button class="row-del" title="حذف ردیف"><svg class="ic"><use href="#i-trash"/></svg></button></div>';
+    }).join('');
+    updateStockDup();
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function findRow(kind, id) {
+    var arr = kind === 'panel' ? state.panels : state.sheets;
+    for (var i = 0; i < arr.length; i++) if (arr[i].id == id) return arr[i];
+    return null;
+  }
+
+  /* ---------- رویدادهای ورودی ---------- */
+  function bindRowEvents(containerSel, kind) {
+    $(containerSel).addEventListener('input', function (e) {
+      var rowEl = e.target.closest('.row'); if (!rowEl) return;
+      var st = findRow(kind, rowEl.dataset.id); if (!st) return;
+      var f = e.target.dataset.f; if (!f) return;
+      if (f === 'label') { st.label = String(e.target.value).slice(0, 60); }
+      else if (f === 'qty') { var q = Math.round(CORE.toNum(e.target.value) || 1); st.qty = Math.min(999, Math.max(1, q)); }
+      else {
+        var v = CORE.toNum(e.target.value) * F.factor;
+        st[f] = (v > 0 && v <= 30000) ? v : (v > 30000 ? 30000 : null); // سقف ۳۰ متر
+      }
+      saveState();
+      updateStockDup();
+    });
+    $(containerSel).addEventListener('focusout', function (e) {
+      var rowEl = e.target.closest('.row'); if (!rowEl) return;
+      var st = findRow(kind, rowEl.dataset.id); if (!st) return;
+      var f = e.target.dataset.f; if (!f || f === 'label') return;
+      if (f === 'qty') e.target.value = st.qty || 1;
+      else e.target.value = disp(st[f]);
+    });
+    $(containerSel).addEventListener('click', function (e) {
+      var del = e.target.closest('.row-del'); if (!del) return;
+      var rowEl = del.closest('.row');
+      var arr = kind === 'panel' ? state.panels : state.sheets;
+      var id = rowEl.dataset.id;
+      for (var i = 0; i < arr.length; i++) if (arr[i].id == id) { arr.splice(i, 1); break; }
+      if (!arr.length) { // همیشه حداقل یک ردیف خالی بماند
+        if (kind === 'panel') state.panels.push({ id: nextId++, label: '', w: null, h: null, qty: 1 });
+        else state.sheets.push({ id: nextId++, w: null, h: null, qty: 1 });
+      }
+      renderRows(); saveState();
+    });
+  }
+
+  /* ---------- گزینه‌ها ---------- */
+  function syncOptInputs() {
+    $('#optKerf').value = state.opt.kerf > 0 ? round3(state.opt.kerf / F.factor) : '';
+    $('#optBandThk').value = state.opt.bandThk > 0 ? round3(state.opt.bandThk / F.factor) : '';
+    $('#bandThkRow').hidden = !state.opt.banding;
+    $('#optLabels').checked = state.opt.labels;
+    $('#optOneSheet').checked = state.opt.oneSheet;
+    $('#optGrain').checked = state.opt.grain;
+    $('#optBanding').checked = state.opt.banding;
+  }
+
+  function syncSettingsInputs() {
+    $('#setPriority').value = state.opt.priority;
+    $('#setQuality').value = state.opt.quality;
+    $('#setUnit').value = state.opt.unit;
+    $('#setDecimals').value = String(state.opt.decimals);
+    $('#setTrim').value = state.opt.trim > 0 ? round3(state.opt.trim / F.factor) : '';
+    $('#setMinOff').value = state.opt.minOffcutLabel > 0 ? round3(state.opt.minOffcutLabel / F.factor) : '';
+  }
+
+  /* ---------- ورق‌های خام تکراری: هشدار + ادغام خودکار ---------- */
+  function dupStockGroups() {
+    var map = {};
+    state.sheets.forEach(function (s) {
+      if (!(s.w > 0 && s.h > 0)) return;
+      var key = s.w + 'x' + s.h;
+      (map[key] = map[key] || []).push(s);
+    });
+    return Object.keys(map).filter(function (k) { return map[k].length > 1; })
+      .map(function (k) { return { key: k, rows: map[k] }; });
+  }
+
+  function updateStockDup() {
+    var el = $('#stockDup');
+    if (!el) return;
+    var groups = dupStockGroups();
+    if (!groups.length) { el.hidden = true; return; }
+    el.hidden = false;
+    $('#stockDupText').textContent = 'ورق خام تکراری: ' + groups.map(function (g) {
+      var p = g.key.split('x');
+      return F.dim(+p[0]) + '×' + F.dim(+p[1]) + ' (' + F.n(g.rows.length) + ' ردیف)';
+    }).join('، ') + ' — می‌توانید تعدادها را در یک ردیف ادغام کنید.';
+  }
+
+  function mergeDupStock() {
+    var groups = dupStockGroups();
+    if (!groups.length) return;
+    var keepOf = {};
+    groups.forEach(function (g) {
+      var keep = g.rows[0];
+      var total = g.rows.reduce(function (a, r) { return a + (r.qty || 0); }, 0);
+      keep.qty = Math.min(9999, Math.max(1, total));
+      keepOf[g.key] = keep;
+    });
+    state.sheets = state.sheets.filter(function (s) {
+      if (!(s.w > 0 && s.h > 0) || !keepOf[s.w + 'x' + s.h]) return true;
+      return s === keepOf[s.w + 'x' + s.h]; // فقط ردیف نگه‌داشته‌شده می‌ماند
+    });
+    renderRows(); saveState();
+    updateStockDup();
+    toast('ورق‌های تکراری ادغام شدند.');
+  }
+
+  /* ---------- محاسبه ---------- */
+  function validate() {
+    var stocks = state.sheets.filter(function (s) { return s.w > 0 && s.h > 0 && s.qty > 0; });
+    if (!stocks.length) { toast('برای هر ورق خام، طول و عرض بزرگ‌تر از صفر و تعداد مثبت وارد کنید.', true); return false; }
+    var panels = state.panels.filter(function (p) { return p.w > 0 && p.h > 0 && p.qty > 0; });
+    if (!panels.length) { toast('برای هر قطعه، طول و عرض بزرگ‌تر از صفر و تعداد مثبت وارد کنید.', true); return false; }
+
+    var k = state.opt.kerf || 0, t = state.opt.trim || 0;
+    for (var i = 0; i < stocks.length; i++) {
+      var s = stocks[i];
+      if (k > 0 && (k >= s.w || k >= s.h)) {
+        toast('ضخامت تیغه (' + F.len(k) + ') باید از طول و عرض ورق کمتر باشد.', true);
+        return false;
+      }
+      if (t > 0 && 2 * (t + k) >= Math.min(s.w, s.h)) {
+        toast('مجموع هرس لبه و تیغه (از هر طرف ' + F.len(t + k) + ') تقریباً کل ورق را می‌برد؛ مقدار هرس را کمتر کنید.', true);
+        return false;
+      }
+    }
+    var totalPieces = panels.reduce(function (a, p) { return a + Math.round(p.qty); }, 0);
+    if (totalPieces > 1200) {
+      toast('حداکثر ۱۲۰۰ قطعه در هر محاسبه مجاز است (فعلاً ' + F.n(totalPieces) + ' قطعه).', true);
+      return false;
+    }
+    return true;
+  }
+
+  /* ---------- اجرای بهینه‌سازی در Web Worker (با fallback به اجرای معمولی) ----------
+     محاسبات سنگین در پس‌زمینه اجرا می‌شود تا UI روی گوشی‌های ضعیف فریز نشود. */
+  function optimizeAsync(input, cb) {
+    var src = window.__CUT_CORE_SRC__;
+    var w = null, url = null, done = false, timer = null;
+    function syncRun(reason) {
+      if (done) return; done = true;
+      try { if (w) w.terminate(); } catch (e) {}
+      try { if (url) URL.revokeObjectURL(url); } catch (e) {}
+      window.__lastWorkerFail = reason || 'unknown';
+      try { cb(null, CORE.optimize(input)); }
+      catch (err) { cb(err); }
+    }
+    try {
+      if (typeof Worker === 'undefined' || !src) throw new Error('unsupported');
+      var boot = src + ';self.onmessage=function(e){var r;try{r={ok:true,val:CutCore.optimize(e.data)};}' +
+        'catch(err){r={ok:false,msg:err&&err.message||String(err)}}self.postMessage(r)};';
+      url = URL.createObjectURL(new Blob([boot], { type: 'text/javascript' }));
+      w = new Worker(url);
+      timer = setTimeout(function () { syncRun('timeout'); }, 20000); // تور ایمنی
+      w.onmessage = function (ev) {
+        if (done) return; done = true;
+        clearTimeout(timer);
+        try { w.terminate(); URL.revokeObjectURL(url); } catch (e) {}
+        window.__lastWorkerFail = null;
+        if (ev.data && ev.data.ok) cb(null, ev.data.val);
+        else cb(new Error(ev.data && ev.data.msg ? ev.data.msg : 'worker error'));
+      };
+      w.onerror = function () { clearTimeout(timer); syncRun('error'); };
+      w.postMessage(input);
+    } catch (e) { clearTimeout(timer); syncRun('unsupported'); }
+  }
+
+  function calculate() {
+    if (!validate()) return;
+    $('#busy').classList.add('show');
+    var input = {
+      sheets: state.sheets.map(function (s) { return { w: s.w, h: s.h, qty: Math.round(s.qty) }; }),
+      panels: state.panels.map(function (p) { return { label: p.label, w: p.w, h: p.h, qty: Math.round(p.qty) }; }),
+      opt: state.opt
+    };
+    setTimeout(function () { // فرصت رندر شدن overlay «در حال بهینه‌سازی»
+      optimizeAsync(input, function (err, res) {
+        $('#busy').classList.remove('show');
+        if (err) { toast('خطا در محاسبه: ' + (err && err.message ? err.message : 'ناشناخته'), true); return; }
+        if (res && res.error) { toast(res.error, true); return; }
+        lastResult = res; lastInput = input;
+        window.__cutyar = { result: res, opt: state.opt, F: F }; // برای تست/اشکال‌زدایی
+        window.__lastCalcUsedWorker = !window.__lastWorkerFail;
+        renderResults(res);
+        if (window.innerWidth < 1024) $('#resultRoot').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }, 80);
+  }
+
+  function renderResults(res) {
+    F = makeF(state.opt);
+    $('#emptyState').hidden = true;
+    $('#resultRoot').hidden = false;
+
+    // حالت خالی: هیچ قطعه‌ای چیده نشد (مثلاً همه از ورق بزرگ‌ترند)
+    if (res.empty || !res.sheets || !res.sheets.length) {
+      $('#resultBar').hidden = true;
+      $('#globalStats').innerHTML = '';
+      $('#legend').innerHTML = '';
+      $('#sheetsWrap').innerHTML = '';
+      var warns0 = [];
+      if (res.problems && res.problems.length) {
+        warns0.push('<b>هیچ قطعه‌ای روی ورق‌ها جا نشد:</b><ul>' +
+          res.problems.map(function (p) {
+            return '<li><span class="num">' + esc(p.label) + ' — ' + F.dim(p.w) + '×' + F.dim(p.h) + '</span> ×' + F.n(p.qty || 1) +
+              (p.reason ? ' <span class="r">(' + esc(p.reason) + ')</span>' : ' <span class="r">(از هر ورق بزرگ‌تر است)</span>') + '</li>';
+          }).join('') + '</ul><span class="small">ابعاد ورق خام را بزرگ‌تر کنید یا ابعاد قطعات را بررسی کنید.</span>');
+      }
+      $('#warnings').innerHTML = warns0.length ? '<div class="warn-card">' + warns0.join('') + '</div>' : '<div class="warn-card">نتیجه‌ای برای نمایش نیست.</div>';
+      $('#metaLine').textContent = '';
+      window.__cutyar = { result: res, opt: state.opt, F: F };
+      return;
+    }
+
+    $('#resultBar').hidden = false;
+    $('#globalStats').innerHTML = R.globalStatsHTML(res, F, PRIO_LABELS);
+
+    // هشدارها
+    var warns = [];
+    if (res.problems && res.problems.length) {
+      warns.push('<b>قطعات زیر چیده نشدند:</b><ul>' +
+        res.problems.map(function (p) {
+          return '<li><span class="num">' + esc(p.label) + ' — ' + F.dim(p.w) + '×' + F.dim(p.h) + '</span> ×' + F.n(p.qty || 1) +
+            (p.reason ? ' <span class="r">(' + esc(p.reason) + ')</span>' : ' <span class="r">(از هر ورق بزرگ‌تر است)</span>') + '</li>';
+        }).join('') + '</ul>');
+    }
+    if (res.totals.unplaced && res.totals.unplaced.length) {
+      warns.push('<b>' + F.n(res.totals.unplaced.reduce(function (a, u) { return a + u.qty; }, 0)) + ' قطعه روی ورق‌ها جا نشد' +
+        (res.totals.limited ? ' (چون گزینه «فقط یک ورق» فعال است)' : '') + ':</b><ul>' +
+        res.totals.unplaced.map(function (u) { return '<li><span class="num">' + esc(u.label) + ' — ' + F.dim(u.w) + '×' + F.dim(u.h) + '</span> ×' + F.n(u.qty) + '</li>'; }).join('') + '</ul>' +
+        '<span class="small">ورق بیشتری به لیست اضافه کنید یا گزینه «فقط یک ورق» را خاموش کنید.</span>');
+    }
+    $('#warnings').innerHTML = warns.length ? '<div class="warn-card">' + warns.join('') + '</div>' : '';
+
+    // راهنمای رنگ‌ها
+    var defIds = {};
+    res.sheets.forEach(function (s) { s.placements.forEach(function (p) { defIds[p.defId] = 1; }); });
+    var chips = [];
+    state.panels.forEach(function (p, i) {
+      if (!(i in defIds)) return;
+      var col = R.palette(i);
+      chips.push('<span class="chip"><span class="sw" style="background:' + col.fill + ';border-color:' + col.stroke + '"></span>' +
+        esc(p.label || ('قطعه ' + (i + 1))) + ' <span class="num muted">' + F.dim(p.w) + '×' + F.dim(p.h) + '</span> ×' + F.n(Math.round(p.qty)) + '</span>');
+    });
+    $('#legend').innerHTML = chips.length ? chips.join('') : '';
+
+    // ورق‌ها
+    $('#sheetsWrap').innerHTML = res.sheets.map(function (s) { return R.sheetCardHTML(s, state.opt, F); }).join('');
+
+    $('#metaLine').textContent = F.n(res.tried) + ' چیدمان جایگزین بررسی شد در ' +
+      new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(res.elapsed / 1000) + ' ثانیه — الگوریتم: برش گیوتین با لحاظ ضخامت تیغه';
+  }
+
+  /* ---------- خروجی همه ورق‌ها ---------- */
+  function downloadAll(type) {
+    if (!lastResult || lastResult.empty || !lastResult.sheets || !lastResult.sheets.length) {
+      toast('ابتدا محاسبه را اجرا کنید.', true); return;
+    }
+    toast('در حال آماده‌سازی ' + F.n(lastResult.sheets.length) + ' تصویر…');
+    lastResult.sheets.forEach(function (s, i) {
+      setTimeout(function () { R.exportSheetImage(s, state.opt, F, type); }, i * 400);
+    });
+  }
+
+  /* ---------- چاپ ---------- */
+  function doPrint() {
+    if (!lastResult || lastResult.empty) { toast('ابتدا محاسبه را اجرا کنید.', true); return; }
+    var dateStr = new Date().toLocaleDateString('fa-IR') + ' — ' + new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    var params = 'واحد: ' + UNIT_LABEL[state.opt.unit] + ' | ضخامت تیغه: ' + F.len(lastResult.kerf) +
+      (lastResult.trim > 0 ? ' | هرس لبه: ' + F.len(lastResult.trim) : '') +
+      (state.opt.banding ? ' | با لبه‌چسبانی' : '') + (state.opt.grain ? ' | با رگه' : '') +
+      ' | اولویت: ' + PRIO_LABELS[state.opt.priority] + ' | تاریخ: ' + dateStr;
+    $('#printRoot').innerHTML = R.buildPrintHTML(lastResult, state.opt, F, params);
+    setTimeout(function () { if (!window.__noRealPrint) window.print(); }, 120);
+  }
+
+  /* ---------- ذخیره/بارگذاری پروژه ---------- */
+  function saveProject() {
+    var data = { app: 'cutyar', version: 1, state: state, nextId: nextId };
+    R.downloadBlob(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }), 'cutyar-project.json');
+    toast('پروژه ذخیره شد.');
+  }
+
+  function loadProject(file) {
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var d = JSON.parse(rd.result);
+        if (!d || d.app !== 'cutyar' || !d.state || typeof d.state !== 'object') throw new Error('ساختار فایل معتبر نیست');
+        nextId = isFinite(+d.nextId) ? Math.min(1e9, Math.max(1, Math.round(+d.nextId))) : 1;
+        state = { opt: sanitizeOpt(d.state.opt), sheets: sanitizeRows(d.state.sheets, 'stock'), panels: sanitizeRows(d.state.panels, 'panel') };
+        renderRows(); syncOptInputs(); syncSettingsInputs(); saveState();
+        toast('پروژه بارگذاری شد. دکمه «محاسبه» را بزنید.');
+      } catch (e) { toast('خطا در بارگذاری: ' + e.message, true); }
+    };
+    rd.readAsText(file);
+  }
+
+  /* ---------- توست ---------- */
+  var toastTimer = null;
+  function toast(msg, err) {
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.toggle('err', !!err);
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 3800);
+  }
+
+  /* ---------- اتصال رویدادها ---------- */
+  function init() {
+    if (!loadState()) { sampleState(); setTimeout(function () { toast('داده نمونه بارگذاری شد؛ دکمه «محاسبه» را بزنید.'); }, 400); }
+    F = makeF(state.opt);
+    renderRows(); syncOptInputs(); syncSettingsInputs();
+
+    bindRowEvents('#panelRows', 'panel');
+    bindRowEvents('#stockRows', 'stock');
+
+    $('#addPanel').addEventListener('click', function () {
+      state.panels.push({ id: nextId++, label: '', w: null, h: null, qty: 1 });
+      renderRows(); saveState();
+      var rows = document.querySelectorAll('#panelRows .row');
+      if (rows.length) rows[rows.length - 1].querySelector('.f-label').focus();
+    });
+    $('#addStock').addEventListener('click', function () {
+      state.sheets.push({ id: nextId++, w: null, h: null, qty: 1 });
+      renderRows(); saveState();
+    });
+
+    // ادغام ورق‌های خام تکراری
+    $('#btnMergeStock').addEventListener('click', mergeDupStock);
+
+    // هشدار اگر فونت وزیرمتن بارگذاری نشده باشد (نسخه سایت بدون پوشه fonts)
+    if (document.fonts && document.fonts.ready && document.fonts.check) {
+      document.fonts.ready.then(function () {
+        if (!document.fonts.check('16px Vazirmatn')) $('#fontWarn').hidden = false;
+      });
+    }
+
+    // گزینه‌ها (با سقف امن)
+    $('#optKerf').addEventListener('input', function () { state.opt.kerf = Math.min(50, Math.max(0, CORE.toNum(this.value) * F.factor)); saveState(); });
+    $('#optBandThk').addEventListener('input', function () { state.opt.bandThk = Math.min(50, Math.max(0, CORE.toNum(this.value) * F.factor)); saveState(); });
+    $('#optLabels').addEventListener('change', function () { state.opt.labels = this.checked; saveState(); });
+    $('#optOneSheet').addEventListener('change', function () { state.opt.oneSheet = this.checked; saveState(); });
+    $('#optGrain').addEventListener('change', function () { state.opt.grain = this.checked; saveState(); });
+    $('#optBanding').addEventListener('change', function () { state.opt.banding = this.checked; $('#bandThkRow').hidden = !this.checked; saveState(); });
+
+    // تنظیمات
+    $('#setPriority').addEventListener('change', function () { state.opt.priority = this.value; saveState(); });
+    $('#setQuality').addEventListener('change', function () { state.opt.quality = this.value; saveState(); });
+    $('#setTrim').addEventListener('input', function () { state.opt.trim = Math.min(500, Math.max(0, CORE.toNum(this.value) * F.factor)); saveState(); });
+    $('#setMinOff').addEventListener('input', function () { state.opt.minOffcutLabel = Math.min(10000, Math.max(0, CORE.toNum(this.value) * F.factor)); saveState(); });
+    $('#setUnit').addEventListener('change', function () {
+      state.opt.unit = this.value;
+      if (this.value === 'cm' && state.opt.decimals === 0) state.opt.decimals = 1;
+      if (this.value === 'm' && state.opt.decimals < 2) state.opt.decimals = 2;
+      if (this.value === 'in' && state.opt.decimals < 2) state.opt.decimals = 2;
+      renderRows(); syncOptInputs(); syncSettingsInputs(); saveState();
+      if (lastResult && !lastResult.empty) renderResults(lastResult);
+    });
+    $('#setDecimals').addEventListener('change', function () {
+      state.opt.decimals = parseInt(this.value, 10) || 0;
+      renderRows(); syncOptInputs(); syncSettingsInputs(); saveState();
+      if (lastResult && !lastResult.empty) renderResults(lastResult);
+    });
+
+    // دکمه‌ها
+    $('#btnCalc').addEventListener('click', calculate);
+    $('#fab').addEventListener('click', calculate);
+    $('#btnPrint').addEventListener('click', doPrint);
+    $('#dlAllPng').addEventListener('click', function () { downloadAll('png'); });
+    $('#dlAllJpg').addEventListener('click', function () { downloadAll('jpg'); });
+    $('#btnSave').addEventListener('click', saveProject);
+    $('#btnLoad').addEventListener('click', function () { $('#fileInput').click(); });
+    $('#fileInput').addEventListener('change', function () {
+      if (this.files && this.files[0]) loadProject(this.files[0]);
+      this.value = '';
+    });
+    $('#btnSample').addEventListener('click', function () { sampleState(); renderRows(); syncOptInputs(); saveState(); toast('مثال بارگذاری شد.'); });
+    $('#btnReset').addEventListener('click', function () { blankState(); renderRows(); syncOptInputs(); saveState(); $('#resultRoot').hidden = true; $('#resultBar').hidden = true; $('#emptyState').hidden = false; lastResult = null; toast('همه داده‌ها پاک شد.'); });
+
+    // مودال‌ها
+    $('#btnSettings').addEventListener('click', function () { syncSettingsInputs(); $('#settingsModal').classList.add('open'); });
+    $('#btnHelp').addEventListener('click', function () { $('#helpModal').classList.add('open'); });
+    document.querySelectorAll('.modal').forEach(function (m) {
+      m.addEventListener('click', function (e) {
+        if (e.target === m || e.target.closest('[data-close]')) m.classList.remove('open');
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') document.querySelectorAll('.modal.open').forEach(function (m) { m.classList.remove('open'); });
+    });
+
+    // خروجی تصویر هر ورق
+    $('#sheetsWrap').addEventListener('click', function (e) {
+      var b = e.target.closest('.exp'); if (!b || !lastResult) return;
+      var idx = parseInt(b.dataset.sheet, 10);
+      var sheet = lastResult.sheets.filter(function (s) { return s.idx === idx; })[0];
+      if (sheet) R.exportSheetImage(sheet, state.opt, F, b.dataset.exp);
+    });
+  }
+
+  window.CutUI = { toast: toast, calculate: calculate }; // برای ماژول رندر/تست
+  document.addEventListener('DOMContentLoaded', init);
+})();
+
+</script>
+</body>
+</html>
